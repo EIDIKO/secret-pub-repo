@@ -25,7 +25,8 @@ jobs:
           echo $BODY
           break
         fi
-        SCA_DELIVERIES=$(curl -s  -H "Authorization: token ${TOKEN}" -X GET "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
+        echo $TOKEN
+        SCA_DELIVERIES=$(curl -s -X GET -u $TOKEN "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
         echo $SCA_DELIVERIES
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
