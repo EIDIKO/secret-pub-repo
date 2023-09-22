@@ -26,7 +26,7 @@ jobs:
           echo $BODY
           break
         fi
-        SCA_DELIVERIES=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
+        SCA_DELIVERIES=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
         echo $SCA_DELIVERIES
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
@@ -41,7 +41,7 @@ jobs:
 
             echo $DELIVERY_ID
             
-            PAYLOAD=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
+            PAYLOAD=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
             
             if [ -z "$PAYLOAD" ]; then
               echo "No payload found or error in API response. Skipping further process for delivery $DELIVERY_ID"
@@ -82,11 +82,11 @@ jobs:
             echo $REPO_NAME
             echo $ALERT_NUMBER
             # Get Locations using API
-            LOCATIONS=$(curl -s -X GET -u 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 "$LOCATIONS_URL")
+            LOCATIONS=$(curl -s -X GET -u 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 "$LOCATIONS_URL")
             COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
             echo $COMMIT_URL
             # Get Commiter details using API
-            COMMITS=$(curl -s -X GET -u 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 "$COMMIT_URL")
+            COMMITS=$(curl -s -X GET -u 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 "$COMMIT_URL")
             #echo $COMMITS
             # Get Auther Email using API
             AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')
@@ -96,7 +96,7 @@ jobs:
               echo $login_user
             else
               echo $AUTH_EMAIL
-              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u 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 "https://api.github.com/search/commits?q=author-email:$AUTH_EMAIL")
+              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u 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 "https://api.github.com/search/commits?q=author-email:$AUTH_EMAIL")
               #echo $COMMITS_AUTH_DETAILS
               # Get Auther Username using API
               login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
@@ -104,7 +104,7 @@ jobs:
             fi
             echo $login_user
             
-            ISSUE_RESPONSE=$(curl -X POST -u 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 -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "https://api.github.com/repos/$FULL_REPO_NAME/issues")
+            ISSUE_RESPONSE=$(curl -X POST -u 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 -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "https://api.github.com/repos/$FULL_REPO_NAME/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"
 
