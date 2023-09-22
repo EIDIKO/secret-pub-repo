@@ -9,10 +9,13 @@ jobs:
       uses: actions/checkout@v2    
     - name: Extract Deliveries for Secret Scan Alerts & Create Issues
       id: extract-delivery-create-issue
+      env:
+        HOOK_ID: ${{ env.HOOK_ID }}
       run: |
         # Extracting Deliverys from the webhook payload
         TOKEN="${{ secrets.MY_PAT }}"
-        API_URL="https://api.github.com/orgs/EIDIKO/hooks/431333026/deliveries"
+        echo "HOOK $HOOK_ID"
+        API_URL="https://api.github.com/orgs/EIDIKO/hooks/$HOOK_ID/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
@@ -23,7 +26,7 @@ jobs:
           echo $BODY
           exit 0
         fi
-        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
+        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
         #echo $SCA_DELIVERIES
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
