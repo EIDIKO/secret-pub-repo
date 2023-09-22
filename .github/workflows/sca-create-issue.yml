@@ -15,8 +15,7 @@ jobs:
         # Extracting Deliverys from the webhook payload
         TOKEN="${{ secrets.MY_PAT }}"
         echo "HOOK $HOOK_ID"
-        echo "Hook ${{ vars.REPO_VARIABLE }}"
-        API_URL="https://api.github.com/orgs/EIDIKO/hooks/$HOOK_ID/deliveries"
+        API_URL="https://api.github.com/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
