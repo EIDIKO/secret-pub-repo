@@ -88,6 +88,7 @@ jobs:
             echo $ALERT_NUMBER
             # Get Locations using API
             LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
+            echo $LOCATIONS
             COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
             echo $COMMIT_URL
             # Get Commiter details using API
