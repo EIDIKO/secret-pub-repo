@@ -11,7 +11,7 @@ jobs:
       id: extract-delivery-create-issue
       run: |
         # Extracting Deliverys from the webhook payload
-        TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        TOKEN="${{ secrets.MY_PAT }}"
         API_URL="https://api.github.com/orgs/EIDIKO/hooks/431333026/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u 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 "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
