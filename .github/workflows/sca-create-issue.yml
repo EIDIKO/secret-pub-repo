@@ -14,6 +14,13 @@ jobs:
         SCA_DELIVERIES=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
+        DELIVERY_ID=$(echo $SCA_DELIVERIES | jq -r '.[0].id')
+        if [ -z "$DELIVERY_ID" ]; then
+          echo "No deliveries found or error in API response."
+          MESSAGE=$(echo $SCA_DELIVERIES | jq -r '.message')
+          echo $MESSAGE
+          break
+        fi
         for DELIVERY in $(echo "${SCA_DELIVERIES}" | jq -r '.[] | @base64'); do
             _jq() {
               echo "${DELIVERY}" | base64 --decode | jq -r "${1}"
