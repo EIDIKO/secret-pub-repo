@@ -13,8 +13,8 @@ jobs:
         # Extracting Deliverys from the webhook payload
         API_URL="https://api.github.com/orgs/EIDIKO/hooks/431333026/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u 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 "$API_URL")
-        HEADERS=$(echo "$RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
-        BODY=$(echo "$RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+        HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+        BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HEADERS
         echo $BODY
         SCA_DELIVERIES=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
