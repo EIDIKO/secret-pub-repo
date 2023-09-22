@@ -12,13 +12,14 @@ jobs:
       run: |
         # Extracting Deliverys from the webhook payload
         TOKEN="${{ secrets.MY_PAT }}"
+        echo "TOEKN: $TOKEN"
         API_URL="https://api.github.com/orgs/EIDIKO/hooks/431333026/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u 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 "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
-        echo $TOKEN
+        
         echo $HEADERS
         echo $BODY
         if [ "$HTTP_STATUS" != "200" ]; then
