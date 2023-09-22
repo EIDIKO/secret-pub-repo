@@ -57,8 +57,12 @@ jobs:
             fi
             echo "Out PUSHER $PUSHER_NAME"
             echo "Webhook Payload $DELIVERY_ID $EVENT $ACTION"
-            if [ "$EVENT" != "secret_scanning_alert" ] && [ "$ACTION" != "created" ]; then
-              echo "Action is not 'reopened/created'. Skipping further process for delivery ID: $DELIVERY_ID"
+            if [ "$EVENT" != "secret_scanning_alert" ]; then
+              echo "Event is not 'secret_scanning_alert'. Skipping further process for delivery ID: $DELIVERY_ID"
+              continue
+            fi
+            if [ "$ACTION" != "created" ]; then
+              echo "Action is not 'created'. Skipping further process for delivery ID: $DELIVERY_ID"
               continue
             fi
             CREATED_AT=$(echo "$PAYLOAD" | jq -r '.created_at')
