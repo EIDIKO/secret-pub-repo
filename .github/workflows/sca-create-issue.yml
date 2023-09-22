@@ -24,7 +24,7 @@ jobs:
           echo $BODY
           break
         fi
-        SCA_DELIVERIES=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
+        SCA_DELIVERIES=$(curl -s -X GET -u ${{ secrets.MY_PAT }} "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
         DELIVERY_ID=$(echo $SCA_DELIVERIES | jq -r '.[0].id')
@@ -38,7 +38,7 @@ jobs:
 
             echo $DELIVERY_ID
             
-            PAYLOAD=$(curl -s -X GET -u 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 "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
+            PAYLOAD=$(curl -s -X GET -u ${{ secrets.MY_PAT }} "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
             
             if [ -z "$PAYLOAD" ]; then
               echo "No payload found or error in API response. Skipping further process for delivery $DELIVERY_ID"
@@ -79,11 +79,11 @@ jobs:
             echo $REPO_NAME
             echo $ALERT_NUMBER
             # Get Locations using API
-            LOCATIONS=$(curl -s -X GET -u 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 "$LOCATIONS_URL")
+            LOCATIONS=$(curl -s -X GET -u ${{ secrets.MY_PAT }} "$LOCATIONS_URL")
             COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
             echo $COMMIT_URL
             # Get Commiter details using API
-            COMMITS=$(curl -s -X GET -u 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 "$COMMIT_URL")
+            COMMITS=$(curl -s -X GET -u ${{ secrets.MY_PAT }} "$COMMIT_URL")
             #echo $COMMITS
             # Get Auther Email using API
             AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')
@@ -101,7 +101,7 @@ jobs:
             fi
             echo $login_user
             
-            ISSUE_RESPONSE=$(curl -X POST -u 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 -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "https://api.github.com/repos/$FULL_REPO_NAME/issues")
+            ISSUE_RESPONSE=$(curl -X POST -u ${{ secrets.MY_PAT }} -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "https://api.github.com/repos/$FULL_REPO_NAME/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"
 
