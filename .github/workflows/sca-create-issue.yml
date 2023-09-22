@@ -18,6 +18,7 @@ jobs:
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
+        echo $TOKEN
         echo $HEADERS
         echo $BODY
         if [ "$HTTP_STATUS" != "200" ]; then
@@ -25,8 +26,7 @@ jobs:
           echo $BODY
           break
         fi
-        echo $TOKEN
-        SCA_DELIVERIES=$(curl -s -X GET -u $TOKEN "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
+        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries")
         echo $SCA_DELIVERIES
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
