@@ -54,7 +54,7 @@ jobs:
           echo $LINK_HEADER
           echo $NEXT_URL
           echo $RREL
-          echo $HEADERS
+          #echo $HEADERS
           if [ "$HTTP_STATUS" != "200" ]; then
             echo "No deliveries found or error in API response, exiting smoothly"
             echo $BODY
@@ -138,7 +138,7 @@ jobs:
               fi
               echo $login_user            
               ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
-              echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              echo "GitHub Issue has been created"
               echo "++++++++++++++++++++++++++++++++++"         
           done 
           echo "::set-output name=rel::$RREL"
@@ -146,4 +146,5 @@ jobs:
         if: always() # Ensure this step always runs to check the condition
         run: |
           REL="${{ steps.set-condition.outputs.rel }}"
+          echo $REL
           echo "::set-output name=rel::$REL" # Pass the new value of REL to the loop
