@@ -44,7 +44,7 @@ jobs:
     steps:
       - name: Set initial condition
         id: set-condition
-        run: echo "{rel}={next}" >> $GITHUB_OUTPUT
+        run: echo "::set-output name=rel::next"
       - name: Run main workflow
         id: main-workflow
         env:
@@ -154,12 +154,12 @@ jobs:
               echo "GitHub Issue has been created"
               echo "++++++++++++++++++++++++++++++++++"         
           done 
-          #echo "::set-output name=rel::$RREL"
-          echo "{rel}={$RREL}" >> $GITHUB_OUTPUT
+          echo "::set-output name=rel::$RREL"
+          #echo "{rel}={$RREL}" >> $GITHUB_OUTPUT
       - name: Check condition and trigger loop
         if: always() # Ensure this step always runs to check the condition
         run: |
           REL="${{ steps.set-condition.outputs.rel }}"
           echo $REL
-          #echo "::set-output name=rel::$REL" # Pass the new value of REL to the loop
-          echo "{rel}={$REL}" >> $GITHUB_OUTPUT
+          echo "::set-output name=rel::$REL" # Pass the new value of REL to the loop
+          #echo "{rel}={$REL}" >> $GITHUB_OUTPUT
