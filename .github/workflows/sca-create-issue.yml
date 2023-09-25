@@ -22,8 +22,10 @@ jobs:
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+        LINK_HEADER=$(echo "$headers" | grep -i "link:" | awk -F': ' '{print $2}')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
+        echo $LINK_HEADER
         echo $HEADERS
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
@@ -32,7 +34,6 @@ jobs:
         fi
         #SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
         echo "Sort the array of JSON objects in ascending order based on the ID field"
-        echo $BODY
         SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.id)')        
         for DELIVERY in $(echo "${BODY}" | jq -r '.[] | @base64'); do
             _jq() {
