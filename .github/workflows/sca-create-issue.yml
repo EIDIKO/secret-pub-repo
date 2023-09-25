@@ -24,8 +24,8 @@ jobs:
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
         LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
-        REL=$(echo "$HTTP_LINK" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
-        NEXT_URL=$(echo "$HTTP_LINK" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+        REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+        NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
         echo $LINK_HEADER
