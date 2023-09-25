@@ -6,10 +6,10 @@ on:
       - completed
   workflow_dispatch:
     inputs:
-      parameter_name:
+      rel:
         description: 'Optional description for the input parameter'
-        required: false
-        default: 'default_value' # Set a default value if needed
+        required: true
+        default: 'next' # Set a default value if needed
 
 jobs:
   loop:
@@ -28,15 +28,10 @@ jobs:
 
   main-workflow:
     runs-on: ubuntu-latest
-    inputs:
-      rel: # Define an input parameter for the rel value
-        description: 'The current rel value'
-        required: true
     steps:
       - name: Set initial condition
         id: set-condition
         run: echo "::set-output name=rel::next"
-
       - name: Run main workflow
         id: main-workflow
         env:
