@@ -18,6 +18,8 @@ jobs:
       - name: Check Condition
         id: check-condition
         run: |
+          EVNT=${{ github.event_name }}
+          echo $EVNT
           REL="${{ github.event.workflow_run.event.inputs.rel }}"
           if [ "$REL" == "next" ]; then
             echo "Condition is true, rerun the main workflow"
