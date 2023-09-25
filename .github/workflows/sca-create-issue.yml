@@ -29,10 +29,11 @@ jobs:
           echo $BODY
           exit 0
         fi
-        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
+        #SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
         echo "Sort the array of JSON objects in ascending order based on the ID field"
-        SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')        
-        for DELIVERY in $(echo "${SCA_DELIVERIES}" | jq -r '.[] | @base64'); do
+        echo $BODY
+        SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.id)')        
+        for DELIVERY in $(echo "${BODY}" | jq -r '.[] | @base64'); do
             _jq() {
               echo "${DELIVERY}" | base64 --decode | jq -r "${1}"
             }
