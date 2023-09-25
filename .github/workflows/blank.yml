@@ -1,10 +1,15 @@
 name: Do-While Loop
-
 on:
   workflow_run:
     workflows: ["main-workflow"]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      parameter_name:
+        description: 'Optional description for the input parameter'
+        required: false
+        default: 'default_value' # Set a default value if needed
 
 jobs:
   loop:
