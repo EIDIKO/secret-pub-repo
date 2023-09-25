@@ -23,12 +23,14 @@ jobs:
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
-        HTTP_LINK=$(echo "$HEADERS" | head -n 1 | awk '{print $13}')
         LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+        REL=$(echo "$HTTP_LINK" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+        NEXT_URL=$(echo "$HTTP_LINK" | sed -n 's/<\([^>]*\)>;.*/\1/p')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
-        echo $HTTP_LINK
         echo $LINK_HEADER
+        echo $NEXT_URL
+        echo $REL
         echo $HEADERS
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
