@@ -18,9 +18,20 @@ jobs:
       - name: Check Condition
         id: check-condition
         run: |
-          EVNT=${{ github.event_name }}
-          echo $EVNT
-          REL="${{ github.event.workflow_run.event.inputs.rel }}"
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            echo "This workflow was triggered by a workflow run."
+            REL="${{ github.event.workflow_run.event.inputs.rel }}"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "This workflow was manually triggered using workflow_dispatch."
+            echo "Input parameter: ${{ github.event.inputs.rel }}"
+            REL="${{ github.event.inputs.rel }}"
+          else
+            echo "This workflow was triggered by an unknown event."
+            exit 1
+          fi
+        
+          echo $REL
+          
           if [ "$REL" == "next" ]; then
             echo "Condition is true, rerun the main workflow"
           else
