@@ -12,26 +12,26 @@ jobs:
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
       run: |
+        # NOTE: Create a repo secret MY_PAT to store a PAT, create a repo variable HOOK_ID to store org webhook id
         # Extracting Deliverys from the webhook payload
         TOKEN="${{ secrets.MY_PAT }}"
         echo "HOOK $HOOK_ID"
-        API_URL="https://api.github.com/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries"
+        BASE_URL="https://api.github.com"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries"
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
+        echo $HEADERS
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
           echo $BODY
           exit 0
         fi
-        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
-        #echo $SCA_DELIVERIES
+        SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
         echo "Sort the array of JSON objects in ascending order based on the ID field"
-        SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')
-        DELIVERY_ID=$(echo $SCA_DELIVERIES | jq -r '.[0].id')
-        
+        SCA_DELIVERIES=$(echo "$SCA_DELIVERIES" | jq 'sort_by(.id)')        
         for DELIVERY in $(echo "${SCA_DELIVERIES}" | jq -r '.[] | @base64'); do
             _jq() {
               echo "${DELIVERY}" | base64 --decode | jq -r "${1}"
@@ -41,7 +41,7 @@ jobs:
 
             echo $DELIVERY_ID
             
-            PAYLOAD=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
+            PAYLOAD=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
             
             if [ -z "$PAYLOAD" ]; then
               echo "No payload found or error in API response. Skipping further process for delivery $DELIVERY_ID"
@@ -94,26 +94,21 @@ jobs:
             COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
             #echo $COMMITS
             # Get Auther Email using API
-            AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')
-            
+            AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
             if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
               login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
               echo $login_user
             else
               echo $AUTH_EMAIL
-              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/search/commits?q=author-email:$AUTH_EMAIL")
+              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
               #echo $COMMITS_AUTH_DETAILS
               # Get Auther Username using API
               login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
-
             fi
-            echo $login_user
-            
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "https://api.github.com/repos/$FULL_REPO_NAME/issues")
+            echo $login_user            
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
-            echo "++++++++++++++++++++++++++++++++++"
-
-            
+            echo "++++++++++++++++++++++++++++++++++"         
         done    
     - name: Issue Created
       if: success()
