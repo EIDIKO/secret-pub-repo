@@ -6,11 +6,11 @@ name: Repository Request
 about: Request the creation of a new repository
 
 ---
-**Template Type:**
-[Repository Request]
+
 
 ## Repository Request
-
+**Template Type:**
+[Repository Request]
 **Name of Repository:**
 
 [Provide a clear and concise name for the repository]
