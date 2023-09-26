@@ -9,8 +9,7 @@ about: Request the creation of a new repository
 
 
 ## Repository Request
-**Template Type:**
-[Repository Request]
+
 **Name of Repository:**
 
 [Provide a clear and concise name for the repository]
