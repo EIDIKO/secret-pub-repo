@@ -17,12 +17,10 @@ jobs:
     - name: Read Issue Properties
       run: |
         issue_body="${{ github.event.issue.body }}"
+        template_properties=$(echo "$issue_body" | \
+          sed -n '/## Repository Request/,/^---/ p' | \
+          grep -v -E '(^## Repository Request|^---$|^$|^\[.*\]$)' | \
+          sed 's/^\** \(.*\): \(.*\)/\1: \2/')
+
+        echo $template_properties
         
-        # Use regular expressions to extract template information
-        template_type_match=$(echo "$issue_body" | grep -oP 'Template Type: \K(.+)')
-        echo $template_type_match
-        if [[ -n "$template_type_match" ]]; then
-          echo "Template Type: $template_type_match"
-        else
-          echo "Template Type not found in issue body"
-        fi
