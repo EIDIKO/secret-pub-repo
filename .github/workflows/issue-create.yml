@@ -20,6 +20,7 @@ jobs:
         
         # Use regular expressions to extract template information
         template_type_match=$(echo "$issue_body" | grep -oP 'Template Type: \K(.+)')
+        echo $template_type_match
         if [[ -n "$template_type_match" ]]; then
           echo "Template Type: $template_type_match"
         else
