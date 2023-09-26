@@ -22,8 +22,9 @@ jobs:
         
         for property_name in "${property_names[@]}"; do
           property_value=$(echo "$issue_body" | sed -n "/$property_name/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/$property_name/ s/^.*: *//")
+          echo "************************************************"
           echo "$property_name : $property_value"
-          echo "::set-output name=$property_name::$property_value"
+          echo "************************************************"
         done
     
         
