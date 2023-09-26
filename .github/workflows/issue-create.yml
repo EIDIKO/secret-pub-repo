@@ -14,13 +14,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Read Issue Properties
+    - name: Read Issue Template Properties
+      id: extract-properties
       run: |
         issue_body="${{ github.event.issue.body }}"
-        template_properties=$(echo "$issue_body" | \
-          sed -n '/## Repository Request/,/^---/ p' | \
-          grep -v -E '(^## Repository Request|^---$|^$|^\[.*\]$)' | \
-          sed 's/^\** \(.*\): \(.*\)/\1: \2/')
-
-        echo $template_properties
+        property_names=("Name of Repository" "Purpose of Repository" "Team or Individual Requesting" "Primary Contact" "Repository Description" "Access and Permissions" "Access Control" "Branching Strategy" "Collaborators" "CI/CD and Automation" "Security and Compliance" "Additional Notes")
+        
+        for property_name in "${property_names[@]}"; do
+          property_value=$(echo "$issue_body" | sed -n "/$property_name/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/$property_name/ s/^.*: *//")
+          echo "::set-output name=$property_name::$property_value"
+        done
+      
+    - name: Print Template Properties
+      run: |
+        echo "Name of Repository: ${{ steps.extract-properties.outputs.'Name of Repository' }}"
+        echo "Purpose of Repository: ${{ steps.extract-properties.outputs.'Purpose of Repository' }}"
+        echo "Team or Individual Requesting: ${{ steps.extract-properties.outputs.'Team or Individual Requesting' }}"
+        echo "Primary Contact: ${{ steps.extract-properties.outputs.'Primary Contact' }}"
+        echo "Repository Description: ${{ steps.extract-properties.outputs.'Repository Description' }}"
+        echo "Access and Permissions: ${{ steps.extract-properties.outputs.'Access and Permissions' }}"
+        echo "Access Control: ${{ steps.extract-properties.outputs.'Access Control' }}"
+        echo "Branching Strategy: ${{ steps.extract-properties.outputs.'Branching Strategy' }}"
+        echo "Collaborators: ${{ steps.extract-properties.outputs.'Collaborators' }}"
+        echo "CI/CD and Automation: ${{ steps.extract-properties.outputs.'CI/CD and Automation' }}"
+        echo "Security and Compliance: ${{ steps.extract-properties.outputs.'Security and Compliance' }}"
+        echo "Additional Notes: ${{ steps.extract-properties.outputs.'Additional Notes' }}"
         
