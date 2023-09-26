@@ -1,3 +1,7 @@
+
+**Template Type:**
+[Repository Request]
+
 ---
 name: Repository Request
 about: Request the creation of a new repository
