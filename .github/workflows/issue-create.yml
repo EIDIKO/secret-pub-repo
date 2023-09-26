@@ -1,0 +1,28 @@
+name: Read Issue Template Properties
+on:
+  issues:
+    types:
+      - opened
+      - edited
+jobs:
+  read_issue_template_properties:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Read Issue Properties
+      uses: actions/javascript-action@v1
+      with:
+        script: |
+          const issueBody = process.env.GITHUB_EVENT.issue.body;
+          
+          // Use regular expressions to extract template information
+          const templateTypeMatch = /Template Type: (.+)/.exec(issueBody);
+          if (templateTypeMatch) {
+            const templateType = templateTypeMatch[1];
+            console.log(`Template Type: ${templateType}`);
+          } else {
+            console.log('Template Type not found in issue body');
+          }
