@@ -43,7 +43,7 @@ about: Request the creation of a new repository
 
 [Choose whether you require approval for adding collaborators to the repository.]
 
-## CI/CD_AND_AUTOMATION:
+## CICD_AND_AUTOMATION:
 
 [Describe any continuous integration and continuous deployment (CI/CD) pipelines, automation scripts, or configuration needed for this repository.]
 
