@@ -28,7 +28,7 @@ jobs:
           property_values["$property_name"]=$extracted_value
           echo "++++++++++++++++++++++++++++++++++++++++++"
         done
-        echo $ property_values["NAME_OF_REPOSITORY"]
-        echo $ property_values["PURPOSE_OF_REPOSITORY"]
-        echo $ property_values["REPOSITORY_DESCRIPTION"]
-        echo $ property_values["TEAM_OR_INDIVIDUAL_REQUSTIN"]
+        echo $property_values["$NAME_OF_REPOSITORY"]
+        echo $property_values["$PURPOSE_OF_REPOSITORY"]
+        echo $property_values["$REPOSITORY_DESCRIPTION"]
+        echo property_values["$TEAM_OR_INDIVIDUAL_REQUSTIN"]
