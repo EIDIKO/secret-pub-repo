@@ -25,7 +25,10 @@ jobs:
           echo "$property_name"
           extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           echo "$extracted_value"
-          property_values[$property_name] = "$extracted_value"
+          if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
+            property_values["NAME_OF_REPOSITORY"]="$extracted_value"
+          fi
+          
           echo "++++++++++++++++++++++++++++++++++++++++++"
         done
         echo $property_values["$NAME_OF_REPOSITORY"]
