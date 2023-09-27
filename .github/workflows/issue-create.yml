@@ -32,5 +32,5 @@ jobs:
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
         done
-        echo env.NAME_OF_REPOSITORY
+        echo $NAME_OF_REPOSITORY
         
