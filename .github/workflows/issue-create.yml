@@ -27,10 +27,11 @@ jobs:
           extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           echo "$extracted_value"
           if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
-            echo "{NAME_OF_REPOSITORY}={$property_name}" >> $GITHUB_OUTPUT
-            echo "{NAME_OF}={VALUE_OF}" >> $GITHUB_OUTPUT
+            
+            echo "::set-output name={NAME_OF_REPOSITORY}::{$property_name}"
+            echo "::set-output name={NAME}::{VALUE}"
             echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF_REPOSITORY }}"
-            echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF }}"
+            echo "RNAME ${{ steps.extract-properties.outputs.NAME }}"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
@@ -39,5 +40,5 @@ jobs:
       id: extract-prope
       run: |
         echo "${{ steps.extract-properties.outputs.NAME_OF_REPOSITORY }}"
-        echo "${{ steps.extract-properties.outputs.NAME_OF }}"
+        echo "${{ steps.extract-properties.outputs.NAME }}"
         
