@@ -6,19 +6,19 @@ about: Request the creation of a new repository
 
 ## Repository Request
 
-**Name of Repository:**
+## Name of Repository:
 
 [Provide a clear and concise name for the repository]
 
-**Purpose of Repository:**
+## Purpose of Repository:
 
 [Explain the purpose and goals of this repository]
 
-**Team or Individual Requesting:**
+## Team or Individual Requesting:
 
 [Name of the requesting team or individual]
 
-**Primary Contact:**
+## Primary Contact:
 
 [Provide the primary contact person's name and contact information]
 
@@ -33,11 +33,11 @@ about: Request the creation of a new repository
 
 [Select one of the options above for the repository's access level.]
 
-- **Access Control:**
+## Access Control:
 
 [Specify who should have access to the repository, including team members, collaborators, or specific individuals.]
 
-## Branching Strategy
+## Branching Strategy:
 
 - [ ] Single Branch (e.g., main, master)
 - [ ] Feature Branching
@@ -46,22 +46,22 @@ about: Request the creation of a new repository
 
 [Choose the branching strategy for the repository or specify if it follows a custom strategy.]
 
-## Collaborators
+## Collaborators:
 
 - [ ] Require approval for adding collaborators
 - [ ] Allow team members to add collaborators without approval
 
 [Choose whether you require approval for adding collaborators to the repository.]
 
-## CI/CD and Automation
+## CI/CD and Automation:
 
 [Describe any continuous integration and continuous deployment (CI/CD) pipelines, automation scripts, or configuration needed for this repository.]
 
-## Security and Compliance
+## Security and Compliance:
 
 [Outline any security, compliance, or regulatory requirements that need to be addressed in this repository.]
 
-## Additional Notes
+## Additional Notes:
 
 [Include any additional information, notes, or special instructions related to this repository request.]
 
