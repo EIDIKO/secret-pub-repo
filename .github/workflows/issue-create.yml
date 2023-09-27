@@ -30,7 +30,7 @@ jobs:
             echo "{NAME_OF_REPOSITORY}={$property_name}" >> $GITHUB_OUTPUT
             echo "{NAME_OF}={VALUE_OF}" >> $GITHUB_OUTPUT
             echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF_REPOSITORY }}"
-            echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF }}
+            echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF }}"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
