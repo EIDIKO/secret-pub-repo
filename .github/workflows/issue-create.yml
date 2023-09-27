@@ -34,12 +34,5 @@ jobs:
             echo "$property : property_values["$property"]"
           done
         shell: bash
-
-      - name: Print Extracted Properties
-        run: |
-          # Print the extracted properties
-          for property in "${properties[@]}"; do
-            echo "$property: ${{ steps.extract_properties.outputs[$property] }}"
-          done
     
         
