@@ -43,10 +43,6 @@ about: Request the creation of a new repository
 
 [Choose whether you require approval for adding collaborators to the repository.]
 
-## CICD_AND_AUTOMATION:
-
-[Describe any continuous integration and continuous deployment CICD pipelines, automation scripts, or configuration needed for this repository.]
-
 ## SECURITY_AND_COMPLIANCE:
 
 [Outline any security, compliance, or regulatory requirements that need to be addressed in this repository.]
@@ -54,6 +50,12 @@ about: Request the creation of a new repository
 ## ADDITIONAL_NOTES:
 
 [Include any additional information, notes, or special instructions related to this repository request.]
+
+## CICD_AND_AUTOMATION:
+
+[Describe any continuous integration and continuous deployment CICD pipelines, automation scripts, or configuration needed for this repository.]
+
+
 
 ## DONE
 ---
