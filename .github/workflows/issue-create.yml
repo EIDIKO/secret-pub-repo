@@ -28,10 +28,10 @@ jobs:
           echo "$extracted_value"
           if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
             echo "NAME_OF_REPOSITORY=$extracted_value" >> $GITHUB_ENV
-            echo "RNAME $NAME_OF_REPOSITORY"
+            echo "RNAME ${NAME_OF_REPOSITORY}"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
         done
-        echo "$NAME_OF_REPOSITORY"
+        echo "${NAME_OF_REPOSITORY}"
         
