@@ -28,10 +28,10 @@ jobs:
           echo "$extracted_value"
           if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
             
-            echo "::set-output name={NAME_OF_REPOSITORY}::{$property_name}"
-            echo "::set-output name={NAME}::{VALUE}"
-            echo "RNAME ${{ steps.extract-properties.outputs.NAME_OF_REPOSITORY }}"
-            echo "RNAME ${{ steps.extract-properties.outputs.NAME }}"
+            echo "{name}={value}" >> $GITHUB_OUTPUT
+            echo "{namee}={value}" >> $GITHUB_OUTPUT
+            echo "RNAME ${{ steps.extract-properties.outputs.name }}"
+            echo "RNAME ${{ steps.extract-properties.outputs.namee }}"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
@@ -39,6 +39,6 @@ jobs:
     - name: Read Issue Template Properties
       id: extract-prope
       run: |
-        echo "${{ steps.extract-properties.outputs.NAME_OF_REPOSITORY }}"
-        echo "${{ steps.extract-properties.outputs.NAME }}"
+        echo "${{ steps.extract-properties.outputs.name }}"
+        echo "${{ steps.extract-properties.outputs.namee }}"
         
