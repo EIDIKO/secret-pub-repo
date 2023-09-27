@@ -7,24 +7,39 @@ on:
       - edited
 
 jobs:
-  read_issue_template_properties:
+  extract_properties:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Extract Repository Properties
+        id: extract_properties
+        run: |
+          # Extract issue body from GitHub event payload
+          issue_body="${{ github.event.issue.body }}"
 
-    - name: Read Issue Template Properties
-      id: extract-properties
-      run: |
-        issue_body="${{ github.event.issue.body }}"
-        property_names=("Name of Repository" "Purpose of Repository" "Team or Individual Requesting" "Primary Contact" "Repository Description" "Access and Permissions" "Access Control" "Branching Strategy" "Collaborators" "CI/CD and Automation" "Security and Compliance" "Additional Notes")
-        
-        for property_name in "${property_names[@]}"; do
-          property_value=$(echo "$issue_body" | sed -n "/$property_name/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/$property_name/ s/^.*: *//")
-          echo "************************************************"
-          echo "$property_name : $property_value"
-          echo "************************************************"
-        done
+          # Define an array of property names
+          properties=("Name of Repository" "Purpose of Repository" "Team or Individual Requesting" "Primary Contact" "Repository Description" "Access and Permissions" "Branching Strategy" "Collaborators" "CI/CD and Automation" "Security and Compliance" "Additional Notes")
+
+          # Initialize an associative array to store property values
+          declare -A property_values
+
+          # Use a for loop to extract property values
+          for property in "${properties[@]}"; do
+            value=$(echo "$issue_body" | grep -oP "(?<=\*\*$property:\*\* ).*")
+            property_values["$property"]=$value
+          done
+
+          # Set the property values as job outputs
+          for property in "${properties[@]}"; do
+            echo "::set-output name=$property::${property_values[$property]}"
+          done
+        shell: bash
+
+      - name: Print Extracted Properties
+        run: |
+          # Print the extracted properties
+          for property in "${properties[@]}"; do
+            echo "$property: ${{ steps.extract_properties.outputs[$property] }}"
+          done
     
         
