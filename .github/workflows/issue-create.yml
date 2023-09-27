@@ -31,7 +31,7 @@ jobs:
 
           # Set the property values as job outputs
           for property in "${properties[@]}"; do
-            echo "$property : $property_values["$property"]"
+            echo "$property : $property_values["$property"][0]"
           done
         shell: bash
     
