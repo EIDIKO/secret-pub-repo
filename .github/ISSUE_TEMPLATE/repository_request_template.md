@@ -45,7 +45,7 @@ about: Request the creation of a new repository
 
 ## CICD_AND_AUTOMATION:
 
-[Describe any continuous integration and continuous deployment (CI/CD) pipelines, automation scripts, or configuration needed for this repository.]
+[Describe any continuous integration and continuous deployment CICD pipelines, automation scripts, or configuration needed for this repository.]
 
 ## SECURITY_AND_COMPLIANCE:
 
