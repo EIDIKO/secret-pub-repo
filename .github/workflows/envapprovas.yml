@@ -1,4 +1,4 @@
-name: Environment Based Approvals
+name: Environment Based Approval
 
 on:
   push:
