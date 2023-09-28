@@ -33,10 +33,10 @@ jobs:
 
             if (true) {
               core.setOutput('approved', 'true');
-              console.log(`Issue approvalComment: ${approvalComment}`)
+              console.log(`Issue true approvalComment: ${approvalComment}`)
             } else {
-              core.setOutput('approved', 'false');
-               console.log(`Issue approvalComment: ${approvalComment}`)
+              core.setOutput('approved', 'true');
+               console.log(`Issue false approvalComment: ${approvalComment}`)
             }
 
       - name: Check Approval and Execute Steps
