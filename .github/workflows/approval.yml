@@ -16,7 +16,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            console.log('Executing Issue Approvals')
             const issueNumber = context.payload.issue.number;
+            console.log('Issue has been approved.')
+            console.log(`Issue Number: ${issueNumber}`)
             const comments = await github.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -26,11 +29,14 @@ jobs:
             const approvalComment = comments.data.find(comment => {
               return comment.body.includes('Approve');
             });
+            console.log(`Issue approvalComment: ${approvalComment}`)
 
             if (approvalComment) {
               core.setOutput('approved', 'true');
+              console.log(`Issue approvalComment: ${approvalComment}`)
             } else {
               core.setOutput('approved', 'false');
+               console.log(`Issue approvalComment: ${approvalComment}`)
             }
 
       - name: Check Approval and Execute Steps
