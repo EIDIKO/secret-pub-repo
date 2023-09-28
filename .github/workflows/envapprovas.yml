@@ -1,4 +1,4 @@
-name: Deploy Workflow
+name: Environment Based Approvals
 
 on:
   push:
