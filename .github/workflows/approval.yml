@@ -1,0 +1,33 @@
+name: Request Approval and Proceed
+
+on:
+  workflow_dispatch: # This event allows manual triggering
+
+jobs:
+  request-approval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request Approval
+        id: approval
+        run: echo "Please review and approve this workflow run"
+    
+      - name: Wait for Approval
+        id: wait
+        run: |
+          if [ ${{ github.event.action }} == "approved" ]; then
+            echo "Approval received, proceeding with further steps."
+          else
+            echo "No approval received. Exiting workflow."
+            exit 1
+          fi
+
+  # Add your further steps here once approval is received
+  further-steps:
+    needs: request-approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Executing Step 1"
+      
+      - name: Step 2
+        run: echo "Executing Step 2"
