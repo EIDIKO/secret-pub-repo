@@ -6,28 +6,25 @@ on:
       - main
 
 jobs:
-  deploy_dev:
+  requested:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env: ['dev']
+    environment: 
+      name: dev
+      url: https://github.com
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Deploy to Dev
         run: |
           # Add your deployment script for the dev environment here
           echo "Deploying to Dev environment"
 
-  deploy_uat:
+
+  approved_or_rejected:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env: ['uat']
+    environment: 
+      name: uat
+      url: https://github.com
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Deploy to UAT
+      - name: Deploy to Dev
         run: |
-          # Add your deployment script for the uat environment here
+          # Add your deployment script for the dev environment here
           echo "Deploying to UAT environment"
