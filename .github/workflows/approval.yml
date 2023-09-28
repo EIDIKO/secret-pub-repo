@@ -4,6 +4,7 @@ on:
   issues:
     types:
       - opened
+      - labeled
 
 jobs:
   check_approval:
@@ -43,8 +44,12 @@ jobs:
         run: |
           # Add the steps you want to execute if the issue is not approved.
           echo "The issue has been not been approved. Skipping additional steps."
+          issue_body="${{ github.event.issue.body }}"
+          echo "issue_body: $issue_body"
       - name: Check Approval and Execute Steps fi approved
         if: steps.approval.outputs.approved == 'true'
         run: |
           # Add the steps you want to execute if the issue is approved.
           echo "The issue has been approved. Performing additional steps."
+          issue_body="${{ github.event.issue.body }}"
+          echo "issue_body: $issue_body"
