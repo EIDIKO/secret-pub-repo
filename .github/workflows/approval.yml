@@ -1,34 +1,40 @@
-name: Request Approval and Proceed
+name: Issue Approval Workflow
 
 on:
-  workflow_dispatch: # This event allows manual triggering
+  issues:
+    types:
+      - opened
 
 jobs:
-  request-approval:
+  check_approval:
     runs-on: ubuntu-latest
-    steps:
-      - name: Request Approval
-        id: approval
-        run: echo "Please review and approve this workflow run"
-    
-      - name: Wait for Approval
-        id: wait
-        run: |
-          ACTION = "approved"
-          if [ "$ACTION" == "approved" ]; then
-            echo "Approval received, proceeding with further steps."
-          else
-            echo "No approval received. Exiting workflow."
-            exit 1
-          fi
 
-  # Add your further steps here once approval is received
-  further-steps:
-    needs: request-approval
-    runs-on: ubuntu-latest
     steps:
-      - name: Step 1
-        run: echo "Executing Step 1"
-      
-      - name: Step 2
-        run: echo "Executing Step 2"
+      - name: Check for Approval Comment
+        id: approval
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.issue.number;
+            const comments = await github.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            const approvalComment = comments.data.find(comment => {
+              return comment.body.includes('Approve');
+            });
+
+            if (approvalComment) {
+              core.setOutput('approved', 'true');
+            } else {
+              core.setOutput('approved', 'false');
+            }
+
+      - name: Check Approval and Execute Steps
+        if: steps.check_approval.outputs.approved == 'true'
+        run: |
+          # Add the steps you want to execute if the issue is approved.
+          echo "The issue has been approved. Performing additional steps."
