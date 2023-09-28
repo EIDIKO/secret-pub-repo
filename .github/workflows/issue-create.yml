@@ -89,6 +89,7 @@ jobs:
           if jq -e '.message' <<< "$CURL_RESPONSE" >/dev/null; then
             echo "'message' field exists in JSON."
             MESSAGE=$(jq -r '.errors' <<< "$CURL_RESPONSE")
+            MESSAGE=$(echo "$MESSAGE" | tr -d '"')
             echo $MESSAGE
             curl -X POST \
               -u "$TOKEN" \
