@@ -86,7 +86,9 @@ jobs:
         ORG_OR_OWNER="${{ github.repository_owner }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
         COMMENT_BODY="Thank you for opening this issue! Your feedback is valuable to us."
-
+        echo $REPO_NAME
+        echo $ORG_OR_OWNER
+        echo $ISSUE_NUMBER
         curl -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
