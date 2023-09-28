@@ -96,3 +96,16 @@ jobs:
           -d '{
             "body": "'"$COMMENT_BODY"'"
           }'        
+    - name: Close Issue
+      run: |
+        TOKEN="${{ secrets.MY_PAT }}"
+        ORG_OR_OWNER="${{ github.repository_owner }}"
+        REPO_NAME="${{ github.repository }}"
+        ISSUE_NUMBER="${{ github.event.issue.number }}"
+        curl -X PATCH \
+          -u "$TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER" \
+          -d '{
+            "state": "closed"
+          }'
