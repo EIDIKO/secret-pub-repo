@@ -28,8 +28,16 @@ jobs:
           extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           echo "$extracted_value"
           if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
-            extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-            echo "extracted_value: $extracted_value"
+            NAME_OF_REPOSITORY=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            echo "NAME_OF_REPOSITORY: $NAME_OF_REPOSITORY"
+          fi
+          if [ "$property_name" == "TEAM_OR_INDIVIDUAL_REQUSTIN" ]; then
+            TEAM_OR_INDIVIDUAL_REQUSTIN=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            echo "TEAM_OR_INDIVIDUAL_REQUSTIN: $TEAM_OR_INDIVIDUAL_REQUSTIN"
+          fi
+          if [ "$property_name" == "REPOSITORY_DESCRIPTION" ]; then
+            REPOSITORY_DESCRIPTION=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            echo "REPOSITORY_DESCRIPTION: $REPOSITORY_DESCRIPTION"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
@@ -38,9 +46,12 @@ jobs:
         ORG_OR_OWNER="${{ github.repository_owner }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
         #TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
-        echo $extracted_value
+        echo $NAME_OF_REPOSITORY
+        echo $TEAM_OR_INDIVIDUAL_REQUSTIN
+        echo $REPOSITORY_DESCRIPTION
         COMMENT_BODY="Thank you for opening this issue! \n \
-                      We are working on your request for Repo Creation with name : $extracted_value"
+                      We are working on your request for Repo Creation with name : $NAME_OF_REPOSITORY \ 
+                      and descritption as $REPOSITORY_DESCRIPTION"
         curl -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
