@@ -89,6 +89,7 @@ jobs:
           if jq -e '.message' <<< "$CURL_RESPONSE" >/dev/null; then
             echo "'message' field exists in JSON."
             MESSAGE=$(jq -r '.message' <<< "$CURL_RESPONSE")
+            echo $MESSAGE
             MESSAGE="Check with adming for **$MESSAGE**"
             echo $MESSAGE
             curl -X POST \
@@ -96,7 +97,7 @@ jobs:
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
               -d '{
-                "body": '"$MESSAGE"'
+                "body":  "'"$MESSAGE"'"
               }'
           
            else
