@@ -50,7 +50,7 @@ jobs:
         echo $TEAM_OR_INDIVIDUAL_REQUSTIN
         echo $REPOSITORY_DESCRIPTION
         COMMENT_BODY="Thank you for opening this issue! \n \
-                      We are working on your request for Repo Creation with name : $NAME_OF_REPOSITORY for $TEAM_OR_INDIVIDUAL_REQUSTIN"
+                      We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
         curl -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
