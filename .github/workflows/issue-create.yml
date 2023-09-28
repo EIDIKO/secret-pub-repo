@@ -37,6 +37,17 @@ jobs:
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
         done
+        REPO_NAME="${{ github.repository }}"
+        ORG_OR_OWNER="${{ github.repository_owner }}"
+        ISSUE_NUMBER="${{ github.event.issue.number }}"
+        COMMENT_BODY="Thank you for opening this issue! \n We are working on your Issue for Repo Creation."
+        curl -X POST \
+          -u "$TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+          -d '{
+            "body": "'"$COMMENT_BODY"'"
+          }'
     - name: Create Repository
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}        
@@ -44,7 +55,6 @@ jobs:
         TOKEN="${{ secrets.MY_PAT }}"
         ORG_OR_OWNER="${{ github.repository_owner }}"
         REPO_NAME="your-repo-name"
-        GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
         curl -s -X POST \
           -u "$TOKEN" \
@@ -86,7 +96,7 @@ jobs:
         REPO_NAME="${{ github.repository }}"
         ORG_OR_OWNER="${{ github.repository_owner }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
-        COMMENT_BODY="Thank you for opening this issue! Your feedback is valuable to us."
+        COMMENT_BODY="We have updated your issue and taken appropriate action! \n\n Closing this issue now."
         echo $REPO_NAME
         echo $ORG_OR_OWNER
         echo $ISSUE_NUMBER
