@@ -8,7 +8,6 @@ on:
 jobs:
   deploy_dev:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && matrix.env == 'dev'
     strategy:
       matrix:
         env: ['dev']
@@ -22,7 +21,6 @@ jobs:
 
   deploy_uat:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && matrix.env == 'uat'
     strategy:
       matrix:
         env: ['uat']
