@@ -87,6 +87,7 @@ jobs:
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           COMMENT_BODY=$(echo "$CURL_RESPONSE" | jq -c .)
+          echo "COMMENT_BODY : $COMMENT_BODY"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
