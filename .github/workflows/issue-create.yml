@@ -28,11 +28,8 @@ jobs:
           extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           echo "$extracted_value"
           if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
-            
-            echo "{name}={value}" >> $GITHUB_OUTPUT
-            echo "{namee}={value}" >> $GITHUB_OUTPUT
-            echo "RNAME ${{ steps.extract-properties.outputs.name }}"
-            echo "RNAME ${{ steps.extract-properties.outputs.namee }}"
+            TOBE_REPO = $(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            echo "TOBE REPO: $TOBE_REPO"
           fi
           
           echo "++++++++++++++++++++++++++++++++++++++++++"
@@ -40,7 +37,10 @@ jobs:
         REPO_NAME="${{ github.repository }}"
         ORG_OR_OWNER="${{ github.repository_owner }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
-        COMMENT_BODY="Thank you for opening this issue! \n We are working on your Issue for Repo Creation."
+        TOBE_REPO2 = $(echo "$issue_body" | sed -n "/NAME_OF_REPOSITORY/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/NAME_OF_REPOSITORY/ s/^.*: *//")
+        echo $TOBE_REPO2
+        COMMENT_BODY="Thank you for opening this issue! \n \
+                      We are working on your request for Repo Creation with name : $TOBE_REPO or  $TOBE_REPO2"
         curl -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
