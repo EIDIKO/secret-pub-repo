@@ -40,7 +40,7 @@ jobs:
             }
 
       - name: Check Approval and Execute Steps
-        if: steps.check_approval.outputs.approved == 'true'
+        if: steps.approval.outputs.approved == 'true'
         run: |
           # Add the steps you want to execute if the issue is approved.
           echo "The issue has been approved. Performing additional steps."
