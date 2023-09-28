@@ -66,7 +66,7 @@ jobs:
         ORG_OR_OWNER="${{ github.repository_owner }}"
         REPO_NAME="your-repo-name"
           
-        curl -s -X POST \
+        CURL_RESPONSE=$(curl -s -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/orgs/$ORG_OR_OWNER/repos \
@@ -82,7 +82,8 @@ jobs:
             "allow_merge_commit": true,
             "allow_rebase_merge": true,
             "delete_branch_on_merge": false
-          }'
+          }')
+          echo "CURL_RESPONSE :: $CURL_RESPONSE"
             
     - name: Add Collaborator
       run: |
