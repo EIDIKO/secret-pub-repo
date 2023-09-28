@@ -92,7 +92,7 @@ jobs:
         curl -X POST \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/$ORG_OR_OWNER/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+          "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
           -d '{
             "body": "'"$COMMENT_BODY"'"
           }'        
