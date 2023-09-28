@@ -83,7 +83,17 @@ jobs:
             "allow_rebase_merge": true,
             "delete_branch_on_merge": false
           }')
-          echo "CURL_RESPONSE :: $CURL_RESPONSE"
+          REPO_NAME="${{ github.repository }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          COMMENT_BODY=$(echo "$CURL_RESPONSE" | jq -c .)
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+            -d '{
+              "body": "'"$COMMENT_BODY"'"
+            }'
             
     - name: Add Collaborator
       run: |
