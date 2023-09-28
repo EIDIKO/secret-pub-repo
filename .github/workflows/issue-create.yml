@@ -88,7 +88,7 @@ jobs:
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           if jq -e '.message' <<< "$CURL_RESPONSE" >/dev/null; then
             echo "'message' field exists in JSON."
-            MESSAGE=$(jq -r '.message' <<< "$CURL_RESPONSE")
+            MESSAGE=$(jq -r '.errors' <<< "$CURL_RESPONSE")
             echo $MESSAGE
             curl -X POST \
               -u "$TOKEN" \
