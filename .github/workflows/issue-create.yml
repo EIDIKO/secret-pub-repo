@@ -37,7 +37,7 @@ jobs:
         REPO_NAME="${{ github.repository }}"
         ORG_OR_OWNER="${{ github.repository_owner }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
-        TOBE_REPO2 = $(echo "$issue_body" | sed -n "/NAME_OF_REPOSITORY/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/NAME_OF_REPOSITORY/ s/^.*: *//")
+        TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
         echo $TOBE_REPO2
         COMMENT_BODY="Thank you for opening this issue! \n \
                       We are working on your request for Repo Creation with name : $TOBE_REPO or  $TOBE_REPO2"
