@@ -1,9 +1,9 @@
 name: Environment Based Approval
 
 on:
-  push:
-    branches:
-      - main
+  issues:
+    types:
+      - opened
 
 jobs:
   requested:
@@ -15,7 +15,8 @@ jobs:
       - name: Deploy to Dev
         run: |
           # Add your deployment script for the dev environment here
-          echo "Deploying to Dev environment"
+          issue_body="${{ github.event.issue.body }}"
+          echo "Deploying to Dev environment $issue_body"
 
 
   approved_or_rejected:
@@ -26,5 +27,6 @@ jobs:
     steps:
       - name: Deploy to Dev
         run: |
+          issue_body="${{ github.event.issue.body }}"
           # Add your deployment script for the dev environment here
-          echo "Deploying to UAT environment"
+          echo "Deploying to UAT environment $issue_body"
