@@ -35,11 +35,15 @@ jobs:
               core.setOutput('approved', 'true');
               console.log(`Issue true approvalComment: ${approvalComment}`)
             } else {
-              core.setOutput('approved', 'true');
+              core.setOutput('approved', 'false');
                console.log(`Issue false approvalComment: ${approvalComment}`)
             }
-
-      - name: Check Approval and Execute Steps
+      - name: Check Approval and Execute Steps if not approved
+        if: steps.approval.outputs.approved == 'false'
+        run: |
+          # Add the steps you want to execute if the issue is not approved.
+          echo "The issue has been not been approved. Skipping additional steps."
+      - name: Check Approval and Execute Steps fi approved
         if: steps.approval.outputs.approved == 'true'
         run: |
           # Add the steps you want to execute if the issue is approved.
