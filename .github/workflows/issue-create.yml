@@ -86,15 +86,21 @@ jobs:
           REPO_NAME="${{ github.repository }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
-          COMMENT_BODY=$(echo "$CURL_RESPONSE" | jq -c .)
-          echo "COMMENT_BODY : $COMMENT_BODY"
-          curl -X POST \
-            -u "$TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
-            -d '{
-              "body": "'"$COMMENT_BODY"'"
-            }'
+          if jq -e '.message' <<< "$CURL_RESPONSE" >/dev/null; then
+            echo "'message' field exists in JSON."
+            MESSAGE=$(jq -r '.message' <<< "$CURL_RESPONSE")
+            echo $MESSAGE
+            curl -X POST \
+              -u "$TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+              -d '{
+                "body": "'"$MESSAGE"'"
+              }'
+          
+           else
+            echo "'message' field does not exist in JSON."
+           fi
             
     - name: Add Collaborator
       run: |
