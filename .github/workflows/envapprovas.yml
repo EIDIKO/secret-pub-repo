@@ -1,0 +1,35 @@
+name: Deploy Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_dev:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && matrix.env == 'dev'
+    strategy:
+      matrix:
+        env: ['dev']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to Dev
+        run: |
+          # Add your deployment script for the dev environment here
+          echo "Deploying to Dev environment"
+
+  deploy_uat:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && matrix.env == 'uat'
+    strategy:
+      matrix:
+        env: ['uat']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to UAT
+        run: |
+          # Add your deployment script for the uat environment here
+          echo "Deploying to UAT environment"
