@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: dev
-      url: https://github.com
+      url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Deploy to Dev
         run: |
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: uat
-      url: https://github.com
+      url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Deploy to Dev
         run: |
