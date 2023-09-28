@@ -101,7 +101,16 @@ jobs:
               }'
           
            else
-            echo "'message' field does not exist in JSON."
+             MESSAGE="Check with admin for below message for any clarity. MESSAGE: **Repository has been created**"
+             echo $MESSAGE
+             curl -X POST \
+               -u "$TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+               -d '{
+                 "body":  "'"$MESSAGE"'"
+               }'
+              echo "'message' field does not exist in JSON."
            fi
             
     - name: Add Collaborator
@@ -111,8 +120,7 @@ jobs:
         REPO_NAME="your-repo-name"
         USERNAME_OR_TEAM="tirapa-kellogs"
         PERMISSION="push"  # Change to the desired permission level
-        GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          
+        GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"          
         curl -s -X PUT \
           -u "$TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
