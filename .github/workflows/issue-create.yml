@@ -68,7 +68,7 @@ jobs:
         TOKEN="${{ secrets.MY_PAT }}"
         ORG_OR_OWNER="${{ github.repository_owner }}"
         REPO_NAME="your-repo-name"
-        USERNAME_OR_TEAM="tirapa-eidiko"
+        USERNAME_OR_TEAM="tirapa-kellogs"
         PERMISSION="push"  # Change to the desired permission level
         GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
