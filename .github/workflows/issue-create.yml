@@ -90,7 +90,7 @@ jobs:
             echo "'message' field exists in JSON."
             MESSAGE=$(jq -r '.message' <<< "$CURL_RESPONSE")
             echo $MESSAGE
-            MESSAGE="Check with admin for below message for any clarity. MESSAGE: **$MESSAGE**"
+            MESSAGE="Check with admin for below message for any clarity.\n MESSAGE: **$MESSAGE**"
             echo $MESSAGE
             curl -X POST \
               -u "$TOKEN" \
@@ -101,7 +101,7 @@ jobs:
               }'
           
            else
-             MESSAGE="Check with admin for below message for any clarity. MESSAGE: **Repository has been created**"
+             MESSAGE="Check with admin for below message for any clarity.\n MESSAGE: **Repository has been created**"
              echo $MESSAGE
              curl -X POST \
                -u "$TOKEN" \
