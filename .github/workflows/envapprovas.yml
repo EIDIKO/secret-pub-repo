@@ -1,15 +1,13 @@
 name: Environment Based Approval
-
 on:
   issues:
     types:
       - opened
-
 jobs:
-  requested:
+  review_repo_request:
     runs-on: ubuntu-latest
     environment: 
-      name: dev
+      name: review
       url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Deploy to Dev
@@ -17,12 +15,21 @@ jobs:
           # Add your deployment script for the dev environment here
           issue_body="${{ github.event.issue.body }}"
           echo "Deploying to Dev environment $issue_body"
-
-
-  approved_or_rejected:
+  approve_repo_request:
     runs-on: ubuntu-latest
     environment: 
-      name: uat
+      name: approve
+      url: "${{ github.event.issue.html_url  }}"
+    steps:
+      - name: Deploy to Dev
+        run: |
+          issue_body="${{ github.event.issue.body }}"
+          # Add your deployment script for the dev environment here
+          echo "Deploying to UAT environment $issue_body"
+  reject_repo_request:
+    runs-on: ubuntu-latest
+    environment: 
+      name: reject
       url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Deploy to Dev
