@@ -5,7 +5,7 @@ on:
     types:
       - opened
   workflow_run:
-    workflows: ["Environment Based Approval"]
+    workflows: ["Environment Approvals"]
     types:
       - completed
 
