@@ -1,9 +1,9 @@
 name: Environment Based Approval
 
 on:
-  issues:
-    types:
-      - opened
+  #issues:
+    #types:
+      #- opened
   workflow_run:
     workflows: ["Environment Approvals"]
     types:
