@@ -10,35 +10,11 @@ on:
       - completed
 
 jobs:
-  review_repo_request:
-    runs-on: ubuntu-latest
-    environment: 
-      name: review
-      url: "${{ github.event.issue.html_url  }}"
-    steps:
-      - name: Deploy to Dev
-        run: |
-          # Add your deployment script for the dev environment here
-          issue_body="${{ github.event.issue.body }}"
-          echo "Deploying to Dev environment $issue_body"
-
-  approve_repo_request:
-    runs-on: ubuntu-latest
-    environment: 
-      name: approve
-      url: "${{ github.event.issue.html_url  }}"
-    steps:
-      - name: Deploy to Dev
-        run: |
-          issue_body="${{ github.event.issue.body }}"
-          # Add your deployment script for the dev environment here
-          echo "Deploying to UAT environment $issue_body"
-
   reject_repo_request:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     environment: 
-      name: reject
+      name: dev
       url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Auto-reject
