@@ -1,0 +1,48 @@
+name: Environment Based Approval
+
+on:
+  issues:
+    types:
+      - opened
+  workflow_run:
+    workflows: ["Environment Based Approval"]
+    types:
+      - completed
+
+jobs:
+  review_repo_request:
+    runs-on: ubuntu-latest
+    environment: 
+      name: review
+      url: "${{ github.event.issue.html_url  }}"
+    steps:
+      - name: Deploy to Dev
+        run: |
+          # Add your deployment script for the dev environment here
+          issue_body="${{ github.event.issue.body }}"
+          echo "Deploying to Dev environment $issue_body"
+
+  approve_repo_request:
+    runs-on: ubuntu-latest
+    environment: 
+      name: approve
+      url: "${{ github.event.issue.html_url  }}"
+    steps:
+      - name: Deploy to Dev
+        run: |
+          issue_body="${{ github.event.issue.body }}"
+          # Add your deployment script for the dev environment here
+          echo "Deploying to UAT environment $issue_body"
+
+  reject_repo_request:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    environment: 
+      name: reject
+      url: "${{ github.event.issue.html_url  }}"
+    steps:
+      - name: Auto-reject
+        run: |
+          issue_body="${{ github.event.workflow_run.workflow_job[1].steps[0].output }}"
+          # Add your rejection script here
+          echo "Auto-rejecting $issue_body"
