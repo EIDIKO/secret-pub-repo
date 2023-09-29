@@ -1,4 +1,4 @@
-name: Env Approvals
+name: Environment Approvals
 on:
   issues:
     types:
