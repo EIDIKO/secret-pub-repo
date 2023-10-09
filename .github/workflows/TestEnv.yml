@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     #if: ${{ needs.approve_repo_request.result == 'failure' }}
     environment:
-      name: dev
+      name: approve
       url: "${{ github.event.issue.html_url }}"
     steps:
       - name: Read Variable
