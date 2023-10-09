@@ -1,4 +1,4 @@
-name: TEST Environment Approvals
+name: Environment Approvals
 on:
   issues:
     types:
@@ -6,40 +6,23 @@ on:
 jobs:
   review_repo_request:
     runs-on: ubuntu-latest
-    environment:
+    environment: 
       name: review
-      url: "${{ github.event.issue.html_url }}"
+      url: "${{ github.event.issue.html_url  }}"
     steps:
-      - name: Set variable issue_number value
+      - name: Set variable issue_number value 
         id: extract-properties
-        env:
-          HOOK_ID: ${{ secrets.HOOK_ID }} # Note: Change to secrets
         run: |
           echo "Neet to set a variable issue_number here"
-
   approve_repo_request:
     needs: [review_repo_request]
     runs-on: ubuntu-latest
-    environment:
+    environment: 
       name: approve
-      url: "${{ github.event.issue.html_url }}"
+      url: "${{ github.event.issue.html_url  }}"
     steps:
       - name: Deploy to Dev
         run: |
           issue_body="${{ github.event.issue.body }}"
           # Add your deployment script for the dev environment here
-          echo "Deploying to UAT environment $issue_body"
-
-  reject_repo_request:
-    needs: [review_repo_request]
-    runs-on: ubuntu-latest
-    #if: ${{ needs.approve_repo_request.result == 'failure' }}
-    environment:
-      name: approve
-      url: "${{ github.event.issue.html_url }}"
-    steps:
-      - name: Read Variable
-        env:
-          HOOK_ID: ${{ secrets.HOOK_ID }} # Note: Change to secrets
-        run: |
-          echo "RES: ${{ needs.approve_repo_request.result}}"
+          echo "Deploying to UAT environment $issue_body"    
