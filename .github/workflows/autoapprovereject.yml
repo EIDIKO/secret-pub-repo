@@ -23,7 +23,8 @@ jobs:
           LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
           echo "Auto-rejecting \n $LOCATIONS"
           echo "${{ toJson(github.event.workflow_run) }}"
-          echo ${{needs.review_repo_request.outputs.issue-number}}
+          echo "DW :  ${{ toJson(needs.downstream.outputs) }}"
+          echo ${{needs.review_repo_request.outputs.issue-url}}
           echo "Workflow Run ID: ${{ github.event.workflow_run.id }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
           echo "Event: ${{ github.event.workflow_run.event }}"
