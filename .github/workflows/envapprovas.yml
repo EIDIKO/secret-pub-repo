@@ -51,6 +51,7 @@ jobs:
           echo $NAME_OF_REPOSITORY
           echo $TEAM_OR_INDIVIDUAL_REQUSTIN
           echo $REPOSITORY_DESCRIPTION
+          echo "{name1}={value1}" >> $GITHUB_OUTPUT
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for opening this issue! \n \
                       We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
