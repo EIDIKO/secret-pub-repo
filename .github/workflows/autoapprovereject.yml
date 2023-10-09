@@ -21,6 +21,7 @@ jobs:
         run: |
           issue_boy="${{ github.event.workflow_run.workflow_job[1] }}"
           echo "Auto-rejecting $issue_body \n $issue_boy"
+          echo "${{ toJson(github.event.workflow_run) }}"
           echo "Workflow Run ID: ${{ github.event.workflow_run.id }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
           echo "Event: ${{ github.event.workflow_run.event }}"
