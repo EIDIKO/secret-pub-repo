@@ -17,9 +17,9 @@ jobs:
       name: dev
       url: "${{ github.event.issue.html_url  }}"
     steps:
-      - name: Auto-reject
       - env:
           OUTPUT1: ${{needs.review_repo_request.outputs.issue-number}}
+      - name: Auto-reject
         run: |
           LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
           LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
