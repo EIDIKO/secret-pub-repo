@@ -10,19 +10,157 @@ jobs:
       name: review
       url: "${{ github.event.issue.html_url  }}"
     steps:
-      - name: Deploy to Dev
+      - name: Read Issue Template Properties
+        id: extract-properties
+        env:
+          HOOK_ID: ${{ vars.HOOK_ID }}
         run: |
-          # Add your deployment script for the dev environment here
+          issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
-          echo "Deploying to Dev environment $issue_body"
+          property_names=("NAME_OF_REPOSITORY" "PURPOSE_OF_REPOSITORY" "TEAM_OR_INDIVIDUAL_REQUSTIN" "PRIMARY_CONTACT" "REPOSITORY_DESCRIPTION" "ACCESS_AND_PERMISSION" "ACCESS_CONTROL" "BRANCHING_STRATEGY" "COLLABORATORS" "SECURITY_AND_COMPLIANCE" "ADDITIONAL_NOTES")
+          TOKEN="${{ secrets.MY_PAT }}"    
+          declare -A property_values
+          echo "==========================================="
+          for property_name in "${property_names[@]}"; do
+            echo "++++++++++++++++++++++++++++++++++++++++++"
+            property_value=$(echo "$issue_body" | sed -n "/$property_name/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/$property_name/ s/^.*: *//")
+            echo "$property_name"
+            extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            echo "$extracted_value"
+            if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
+              NAME_OF_REPOSITORY=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+              echo "NAME_OF_REPOSITORY: $NAME_OF_REPOSITORY"
+            fi
+            if [ "$property_name" == "TEAM_OR_INDIVIDUAL_REQUSTIN" ]; then
+              TEAM_OR_INDIVIDUAL_REQUSTIN=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+              echo "TEAM_OR_INDIVIDUAL_REQUSTIN: $TEAM_OR_INDIVIDUAL_REQUSTIN"
+            fi
+            if [ "$property_name" == "REPOSITORY_DESCRIPTION" ]; then
+              REPOSITORY_DESCRIPTION=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+              echo "REPOSITORY_DESCRIPTION: $REPOSITORY_DESCRIPTION"
+            fi
+          
+            echo "++++++++++++++++++++++++++++++++++++++++++"
+          done
+          REPO_NAME="${{ github.repository }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          #TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
+          echo $NAME_OF_REPOSITORY
+          echo $TEAM_OR_INDIVIDUAL_REQUSTIN
+          echo $REPOSITORY_DESCRIPTION
+          COMMENT_BODY="Thank you for opening this issue! \n \
+                      We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+            -d '{
+              "body": "'"$COMMENT_BODY"'"
+            }'
   approve_repo_request:
     runs-on: ubuntu-latest
     environment: 
       name: approve
       url: "${{ github.event.issue.html_url  }}"
     steps:
-      - name: Deploy to Dev
+      - name: Create Repository
+        env:
+          HOOK_ID: ${{ vars.HOOK_ID }} 
         run: |
-          issue_body="${{ github.event.issue.body }}"
-          # Add your deployment script for the dev environment here
-          echo "Deploying to UAT environment $issue_body"
+          TOKEN="${{ secrets.MY_PAT }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          REPO_NAME="your-repo-name"
+            
+          CURL_RESPONSE=$(curl -s -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/$ORG_OR_OWNER/repos \
+            -d '{
+              "name": "'$REPO_NAME'",
+              "description": "Your repository description",
+              "private": false,
+              "has_issues": true,
+              "has_projects": true,
+              "has_wiki": true,
+              "auto_init": true,
+              "allow_squash_merge": true,
+              "allow_merge_commit": true,
+              "allow_rebase_merge": true,
+              "delete_branch_on_merge": false
+            }')
+            REPO_NAME="${{ github.repository }}"
+            ORG_OR_OWNER="${{ github.repository_owner }}"
+            ISSUE_NUMBER="${{ github.event.issue.number }}"
+            if jq -e '.message' <<< "$CURL_RESPONSE" >/dev/null; then
+              echo "'message' field exists in JSON."
+              MESSAGE=$(jq -r '.message' <<< "$CURL_RESPONSE")
+              echo $MESSAGE
+              MESSAGE="Check with admin for below message for any clarity.\n MESSAGE: **$MESSAGE**"
+              echo $MESSAGE
+              curl -X POST \
+                -u "$TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+                -d '{
+                  "body":  "'"$MESSAGE"'"
+                }'
+            
+             else
+               MESSAGE="Check with admin for below message for any clarity.\n MESSAGE: **Repository has been created**"
+               echo $MESSAGE
+               curl -X POST \
+                 -u "$TOKEN" \
+                 -H "Accept: application/vnd.github.v3+json" \
+                 "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+                 -d '{
+                   "body":  "'"$MESSAGE"'"
+                 }'
+                echo "'message' field does not exist in JSON."
+             fi
+              
+      - name: Add Collaborator
+        run: |
+          TOKEN="${{ secrets.MY_PAT }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          REPO_NAME="your-repo-name"
+          USERNAME_OR_TEAM="tirapa-kellogs"
+          PERMISSION="push"  # Change to the desired permission level
+          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"          
+          curl -s -X PUT \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/$ORG_OR_OWNER/$REPO_NAME/collaborators/$USERNAME_OR_TEAM \
+            -d '{
+              "permission": "'$PERMISSION'"
+            }'
+      - name: Comment on Issue
+        run: |
+          TOKEN="${{ secrets.MY_PAT }}"
+          REPO_NAME="${{ github.repository }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          COMMENT_BODY="We have updated your issue and taken appropriate action! \n\n Closing this issue now."
+          echo $REPO_NAME
+          echo $ORG_OR_OWNER
+          echo $ISSUE_NUMBER
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+            -d '{
+              "body": "'"$COMMENT_BODY"'"
+            }'        
+      - name: Close Issue
+        run: |
+          TOKEN="${{ secrets.MY_PAT }}"
+          ORG_OR_OWNER="${{ github.repository_owner }}"
+          REPO_NAME="${{ github.repository }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          curl -X PATCH \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER" \
+            -d '{
+              "state": "closed"
+            }'
