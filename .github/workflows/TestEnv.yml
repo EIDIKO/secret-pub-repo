@@ -29,6 +29,7 @@ jobs:
           # Add your deployment script for the dev environment here
           echo "Deploying to UAT environment $issue_body"
   reject_repo_request:
+      needs: [approve_repo_request]
       runs-on: ubuntu-latest
       if: ${{ needs.approve_repo_request.result == 'failure' }}
       environment:
@@ -39,4 +40,4 @@ jobs:
           env:
             HOOK_ID: ${{ vars.HOOK_ID }} # Note: Change to secrets
           run: |
-            echo "Need to print the variable here $issue_number"   
+            echo "Need to print the variable here $issue_number"     
