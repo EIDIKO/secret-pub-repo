@@ -20,7 +20,4 @@ jobs:
       - name: Auto-reject
         run: |
           issue_body="${{ github.event.workflow_run.workflow_job[1].steps[0].output }}"
-          issue_boy="${{ github.event.workflow_run.workflow_job[0].steps[0].output }}"
-          # Add your rejection script here
-          #echo "${{ workflow.event.workflow_run.outputs.issue-number }}"
           echo "Auto-rejecting $issue_body  $issue_boy"
