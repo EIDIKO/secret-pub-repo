@@ -65,6 +65,7 @@ jobs:
               "body": "'"$COMMENT_BODY"'"
             }'
   approve_repo_request:
+    needs: [review_repo_request]
     runs-on: ubuntu-latest
     outputs:
       issue-url: ${{ github.event.issue.html_url  }} 
