@@ -19,6 +19,18 @@ jobs:
     steps:
       - name: Auto-reject
         run: |
-          issue_body="${{ toJson(github.event.workflow_run) }}"
+          #issue_body="${{ toJson(github.event.workflow_run) }}"
           issue_boy="${{ github.event.workflow_run.workflow_job[1] }}"
           echo "Auto-rejecting $issue_body \n $issue_boy"
+          echo "Workflow Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Workflow Name: ${{ github.event.workflow_run.name }}"
+          echo "Event: ${{ github.event.workflow_run.event }}"
+          echo "Status: ${{ github.event.workflow_run.status }}"
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Created At: ${{ github.event.workflow_run.created_at }}"
+          echo "Updated At: ${{ github.event.workflow_run.updated_at }}"
+          echo "Head Commit: ${{ github.event.workflow_run.head_commit }}"
+          echo "Repository: ${{ github.event.workflow_run.repository }}"
+          echo "Head Repository: ${{ github.event.workflow_run.head_repository }}"
+          echo "Actor: ${{ github.event.workflow_run.actor }}"
+          echo "Sender: ${{ github.event.workflow_run.sender }}"
