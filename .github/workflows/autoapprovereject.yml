@@ -22,6 +22,8 @@ jobs:
           LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
           LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
           echo "DWA :  ${{ toJson(needs.review_repo_request.outputs) }}"
+          echo "DWA :  ${{ toJson(needs.approve_repo_request.outputs) }}"
+
           echo "Auto-rejecting \n $LOCATIONS"
           echo "${{ toJson(github.event.workflow_run) }}"
           
