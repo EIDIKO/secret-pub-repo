@@ -19,8 +19,9 @@ jobs:
     steps:
       - name: Auto-reject
         run: |
-          issue_boy="${{ github.event.workflow_run.workflow_job[1] }}"
-          echo "Auto-rejecting $issue_body \n $issue_boy"
+          LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
+          LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
+          echo "Auto-rejecting $issue_body \n $LOCATIONS"
           echo "${{ toJson(github.event.workflow_run) }}"
           echo "Workflow Run ID: ${{ github.event.workflow_run.id }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
