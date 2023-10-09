@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       issue-number: ${{ steps.extract-properties.outputs.test }}
+      issue-url: ${{ github.event.issue.html_url  }} 
     environment: 
       name: review
       url: "${{ github.event.issue.html_url  }}"
@@ -16,6 +17,7 @@ jobs:
         id: extract-properties
         env:
           HOOK_ID: ${{ vars.HOOK_ID }}
+          issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
