@@ -66,6 +66,8 @@ jobs:
             }'
   approve_repo_request:
     runs-on: ubuntu-latest
+    outputs:
+      issue-url: ${{ github.event.issue.html_url  }} 
     environment: 
       name: approve
       url: "${{ github.event.issue.html_url  }}"
