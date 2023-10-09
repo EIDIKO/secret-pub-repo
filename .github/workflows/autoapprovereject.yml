@@ -19,6 +19,6 @@ jobs:
     steps:
       - name: Auto-reject
         run: |
-          issue_body="${{ github.event.workflow_run }}"
+          issue_body="${{ toJson(github.event.workflow_run) }}"
           issue_boy="${{ github.event.workflow_run.workflow_job[1] }}"
           echo "Auto-rejecting $issue_body \n $issue_boy"
