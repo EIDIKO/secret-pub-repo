@@ -98,7 +98,9 @@ jobs:
           ORG_OR_OWNER="${{ github.repository_owner }}"
           REPO_NAME=${{ needs.review_repo_request.outputs.repo-name }}
           REPO_DESC=${{ needs.review_repo_request.outputs.repo-desc }}
+          echo "Before PRIVATE_REPO"
           PRIVATE_REPO = false
+          echo "After PRIVATE_REPO"
             
           CURL_RESPONSE=$(curl -s -X POST \
             -u "$TOKEN" \
@@ -117,6 +119,9 @@ jobs:
               "allow_rebase_merge": true,
               "delete_branch_on_merge": false
             }')
+            echo "After CURL"
+            echo "After $CURL_RESPONSE"
+            
             REPO_NAME="${{ github.repository }}"
             ORG_OR_OWNER="${{ github.repository_owner }}"
             ISSUE_NUMBER="${{ github.event.issue.number }}"
