@@ -49,7 +49,7 @@ jobs:
 
             echo $DELIVERY_ID
             
-            PAYLOAD=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/431333026/deliveries/${DELIVERY_ID}")
+            PAYLOAD=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries/${DELIVERY_ID}")
             
             if [ -z "$PAYLOAD" ]; then
               echo "No payload found or error in API response. Skipping further process for delivery $DELIVERY_ID"
