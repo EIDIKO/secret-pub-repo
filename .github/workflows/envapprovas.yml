@@ -99,7 +99,7 @@ jobs:
           REPO_NAME="${{ needs.review_repo_request.outputs.repo-name }}"
           REPO_DESC="${{ needs.review_repo_request.outputs.repo-desc }}"
           echo "Before PRIVATE_REPO"
-          PRIVATE_REPO = false
+          #PRIVATE_REPO = "false"
           echo "After PRIVATE_REPO"
             
           CURL_RESPONSE=$(curl -s -X POST \
