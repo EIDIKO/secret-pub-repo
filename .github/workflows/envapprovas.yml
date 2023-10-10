@@ -108,7 +108,7 @@ jobs:
             https://api.github.com/orgs/$ORG_OR_OWNER/repos \
             -d '{
               "name": "'$REPO_NAME'",
-              "description": "Sample description",
+              "description": "${{ needs.review_repo_request.outputs.repo-desc }}",
               "private": false,
               "has_issues": true,
               "has_projects": true,
