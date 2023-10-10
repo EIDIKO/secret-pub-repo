@@ -1,4 +1,4 @@
-name: Environment Approvals
+name: Request for Repo Creation
 on:
   issues:
     types:
