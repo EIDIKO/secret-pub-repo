@@ -6,6 +6,8 @@ on:
 jobs:
   review_repo_request:
     runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.extract-properties.outputs.build_id }}
     environment: 
       name: review
       url: "${{ github.event.issue.html_url  }}"
@@ -13,6 +15,7 @@ jobs:
       - name: Set variable issue_number value 
         id: extract-properties
         run: |
+          echo "build_id=1234" >> $GITHUB_OUTPUT
           echo "Neet to set a variable issue_number here"
   approve_repo_request:
     needs: [review_repo_request]
@@ -23,6 +26,7 @@ jobs:
     steps:
       - name: Deploy to Dev
         run: |
+          echo "BID ${{ needs.review_repo_request.outputs.build_id }}"
           issue_body="${{ github.event.issue.body }}"
           # Add your deployment script for the dev environment here
           echo "Deploying to UAT environment $issue_body"    
