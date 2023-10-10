@@ -5,7 +5,7 @@ on:
     #types:
       #- opened
   workflow_run:
-    workflows: ["Request for Repo Creations"]
+    workflows: ["Request for Repo Creation"]
     types:
       - completed
 
