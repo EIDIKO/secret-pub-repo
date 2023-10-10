@@ -96,7 +96,9 @@ jobs:
           echo "DESC ${{ needs.review_repo_request.outputs.repo-desc }}"
           TOKEN="${{ secrets.MY_PAT }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
-          REPO_NAME="your-repo-name"
+          REPO_NAME=${{ needs.review_repo_request.outputs.repo-name }}
+          REPO_DESC=${{ needs.review_repo_request.outputs.repo-desc }}
+          PRIVATE_REPO = false
             
           CURL_RESPONSE=$(curl -s -X POST \
             -u "$TOKEN" \
@@ -104,7 +106,7 @@ jobs:
             https://api.github.com/orgs/$ORG_OR_OWNER/repos \
             -d '{
               "name": "'$REPO_NAME'",
-              "description": "Your repository description",
+              "description": "'$REPO_DESC'",
               "private": false,
               "has_issues": true,
               "has_projects": true,
@@ -149,8 +151,10 @@ jobs:
         run: |
           TOKEN="${{ secrets.MY_PAT }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
-          REPO_NAME="your-repo-name"
-          USERNAME_OR_TEAM="tirapa-kellogs"
+          #REPO_NAME="your-repo-name"
+          REPO_NAME=${{ needs.review_repo_request.outputs.repo-name }}
+          #USERNAME_OR_TEAM="tirapa-kellogs"
+          USERNAME_OR_TEAM=${{ needs.review_repo_request.outputs.repo-owner }}
           PERMISSION="push"  # Change to the desired permission level
           GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"          
           curl -s -X PUT \
