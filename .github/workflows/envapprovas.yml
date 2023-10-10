@@ -91,9 +91,9 @@ jobs:
           HOOK_ID: ${{ vars.HOOK_ID }} 
         run: |
           echo "BID ${{ needs.review_repo_request.outputs.issue-number }}"
-          echo "NAME ${{ needs.review_repo_request.outputs.issue-name }}"
-          echo "OWNER ${{ needs.review_repo_request.outputs.issue-owner }}"
-          echo "DESC ${{ needs.review_repo_request.outputs.issue-desc }}"
+          echo "NAME ${{ needs.review_repo_request.outputs.repo-name }}"
+          echo "OWNER ${{ needs.review_repo_request.outputs.repo-owner }}"
+          echo "DESC ${{ needs.review_repo_request.outputs.repo-desc }}"
           TOKEN="${{ secrets.MY_PAT }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           REPO_NAME="your-repo-name"
