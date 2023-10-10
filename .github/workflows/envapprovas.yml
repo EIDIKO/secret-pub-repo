@@ -37,19 +37,19 @@ jobs:
             if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
               NAME_OF_REPOSITORY=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
               #echo "repo-name=$NAME_OF_REPOSITORY" >> $GITHUB_OUTPUT
-              #echo "::set-output name=issue-name::${NAME_OF_REPOSITORY}"
+              echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
               echo "NAME_OF_REPOSITORY: $NAME_OF_REPOSITORY"
             fi
             if [ "$property_name" == "TEAM_OR_INDIVIDUAL_REQUSTIN" ]; then
               TEAM_OR_INDIVIDUAL_REQUSTIN=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
               #echo "repo-owner=$TEAM_OR_INDIVIDUAL_REQUSTIN" >> $GITHUB_OUTPUT
-              #echo "::set-output name=issue-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
+              echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
               echo "TEAM_OR_INDIVIDUAL_REQUSTIN: $TEAM_OR_INDIVIDUAL_REQUSTIN"
             fi
             if [ "$property_name" == "REPOSITORY_DESCRIPTION" ]; then
               REPOSITORY_DESCRIPTION=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
               #echo "repo-desc=$REPOSITORY_DESCRIPTION" >> $GITHUB_OUTPUT
-              #echo "::set-output name=issue-desc::${REPOSITORY_DESCRIPTION}"
+              echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
               echo "REPOSITORY_DESCRIPTION: $REPOSITORY_DESCRIPTION"
             fi
           
@@ -65,9 +65,9 @@ jobs:
           echo "{test}={testing}" >> $GITHUB_OUTPUT
           #echo "issue-numbe=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
-          echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
-          echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
-          echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
+          #echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
+          #echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
+          #echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
           COMMENT_BODY="Thank you for opening this issue! \n \
                       We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
           curl -X POST \
