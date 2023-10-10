@@ -7,7 +7,7 @@ jobs:
   review_repo_request:
     runs-on: ubuntu-latest
     outputs:
-      issue-number: ${{ steps.extract-properties.outputs.test }}
+      issue-number: ${{ steps.extract-properties.outputs.issue-number }}
       issue-url: ${{ github.event.issue.html_url  }} 
     environment: 
       name: review
@@ -54,6 +54,7 @@ jobs:
           echo $TEAM_OR_INDIVIDUAL_REQUSTIN
           echo $REPOSITORY_DESCRIPTION
           echo "{test}={testing}" >> $GITHUB_OUTPUT
+          echo "issue-numbe=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for opening this issue! \n \
                       We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
@@ -77,6 +78,7 @@ jobs:
         env:
           HOOK_ID: ${{ vars.HOOK_ID }} 
         run: |
+          echo "BID ${{ needs.review_repo_request.outputs.issue-number }}"
           TOKEN="${{ secrets.MY_PAT }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           REPO_NAME="your-repo-name"
