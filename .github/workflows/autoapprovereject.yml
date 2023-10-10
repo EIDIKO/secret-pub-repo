@@ -1,11 +1,11 @@
-name: Environment Based Approval
+name: Rejecct Repo Comment and Close Issue
 
 on:
   #issues:
     #types:
       #- opened
   workflow_run:
-    workflows: ["Environment Approvals"]
+    workflows: ["Request for Repo Creations"]
     types:
       - completed
 
