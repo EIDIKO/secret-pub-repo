@@ -98,9 +98,9 @@ jobs:
           ORG_OR_OWNER="${{ github.repository_owner }}"
           REPO_NAME="${{ needs.review_repo_request.outputs.repo-name }}"
           REPO_DESC="${{ needs.review_repo_request.outputs.repo-desc }}"
-          echo "Before PRIVATE_REPO"
+          echo "Before PRIVATE_REPO $REPO_NAME"
           #PRIVATE_REPO = "false"
-          echo "After PRIVATE_REPO"
+          echo "After PRIVATE_REPO $REPO_DESC"
             
           CURL_RESPONSE=$(curl -s -X POST \
             -u "$TOKEN" \
@@ -108,7 +108,7 @@ jobs:
             https://api.github.com/orgs/$ORG_OR_OWNER/repos \
             -d '{
               "name": "'$REPO_NAME'",
-              "description": "'$REPO_DESC'",
+              "description": "Sample description",
               "private": false,
               "has_issues": true,
               "has_projects": true,
