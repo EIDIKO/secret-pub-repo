@@ -19,7 +19,7 @@ jobs:
         TOKEN="${{ secrets.MY_PAT }}"
         echo "HOOK $HOOK_ID"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=100&page=1&state=open"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=5&page=1&state=open"
         API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
@@ -28,7 +28,7 @@ jobs:
         NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
-        echo $LINK_HEADER
+        echo "LINK $LINK_HEADER"
         echo $NEXT_URL
         echo $REL
         echo $HEADERS
