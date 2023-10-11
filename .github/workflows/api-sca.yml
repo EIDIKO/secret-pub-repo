@@ -26,7 +26,10 @@ jobs:
         SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo "Status: $HTTP_STATUS"
         echo "LINK: $LINK_HEADER"
-        UURL=$(echo "$LINK_HEADER" | grep -oP '<(.*?)>' | sed 's/<>//')
+        SECOND_URL="${URL_ARRAY[1]}"
+        SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
+        echo "Second URL: $SECOND_URL"
+        IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
         echo "UURL: $UURL"
         echo "NEXT_URL: $NEXT_URL"
         echo "REL: $REL"
