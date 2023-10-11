@@ -26,6 +26,8 @@ jobs:
           echo "REPO: $REPO_NAME"
           echo "LOCATIONS_URL: $LOCATIONS_URL"
           ISSUES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/issues?labels=${{ github.event.workflow_run.id }}")
-          echo $ISSUES
+          #echo $ISSUES
+          ISSUE_URL=$(echo "$ISSUES" | jq -r '.[0].url')
+          echo $ISSUE_URL
           
           
