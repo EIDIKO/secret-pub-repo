@@ -1,0 +1,97 @@
+name: API Secret Sacn to Check SCAs & Create Issue for Created SCAs
+on:
+  workflow_dispatch
+  #schedule:
+    #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2    
+    - name: Extract Deliveries for Secret Scan Alerts & Create Issues
+      id: extract-delivery-create-issue
+      env:
+        HOOK_ID: ${{ vars.HOOK_ID }}
+      run: |
+        # NOTE: Create a repo secret MY_PAT to store a PAT, create a repo variable HOOK_ID to store org webhook id
+        # Extracting Deliverys from the webhook payload
+        TOKEN="${{ secrets.MY_PAT }}"
+        echo "HOOK $HOOK_ID"
+        BASE_URL="https://api.github.com"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=100&page=1&state=open"
+        API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+        HEADERS=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+        HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+        LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+        REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+        NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+        BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+        echo $HTTP_STATUS
+        echo $LINK_HEADER
+        echo $NEXT_URL
+        echo $REL
+        echo $HEADERS
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "No deliveries found or error in API response, exiting smoothly"
+          echo $BODY
+          exit 0
+        fi
+        echo "Sort the array of JSON objects in ascending order based on the created_at"
+        SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.created_at)')        
+        for DELIVERY in $(echo "${BODY}" | jq -r '.[] | @base64'); do
+            _jq() {
+              echo "${DELIVERY}" | base64 --decode | jq -r "${1}"
+            }
+            echo "++++++++++++++++++++++++++++++++++"
+            DELIVERY_ID=$(_jq '.html_url')
+
+            
+            CREATED_AT=$(_jq '.created_at')
+            OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
+
+            if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+              echo "Delivery ID $DELIVERY_ID is older than 24 hours. Skipping further process."
+              continue
+            fi
+            echo "Delivery ID $DELIVERY_ID is not older than 24 hours"
+            SECRET=$(_jq '.secret_type')
+            HTML_URL=$(_jq '.html_url')
+            ALERT_NUMBER=$(_jq '.number')
+            LOCATIONS_URL=$(_jq '.locations_url')
+            REPO_NAME=$(_jq '.repository.name')
+            FULL_REPO_NAME=$(_jq '.repository.full_name')
+            echo $SECRET
+            echo $LOCATIONS_URL
+            echo $FULL_REPO_NAME
+            echo $HTML_URL
+            echo $REPO_NAME
+            echo $ALERT_NUMBER
+            # Get Locations using API
+            LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
+            echo $LOCATIONS
+            COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
+            echo $COMMIT_URL
+            # Get Commiter details using API
+            COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
+            #echo $COMMITS
+            # Get Auther Email using API
+            AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
+            if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
+              login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
+              echo $login_user
+            else
+              echo $AUTH_EMAIL
+              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
+              #echo $COMMITS_AUTH_DETAILS
+              # Get Auther Username using API
+              login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
+            fi
+            echo $login_user            
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+            echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+            echo "++++++++++++++++++++++++++++++++++"         
+        done    
+    - name: Issue Created
+      if: success()
+      run: echo "GitHub issue created successfully."
