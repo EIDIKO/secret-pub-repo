@@ -59,8 +59,8 @@ jobs:
           exit 0
         fi
         
-        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'page=' '{print $2}' | awk -F'&' '{print $1}')
-        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'page=' '{print $2}' | awk -F'&' '{print $1}')
+        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'&page=' '{print $2}' | awk -F'&' '{print $1}')
+
 
         echo "Page Value: $PAGE_VALUE"
 
