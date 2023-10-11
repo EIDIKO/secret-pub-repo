@@ -29,32 +29,33 @@ jobs:
         BODY=$(echo "$API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo $HTTP_STATUS
         echo "LINK $LINK_HEADER"
-        echo $NEXT_URL
-        echo $REL
-        echo $HEADERS
+        echo "NEXT_URL: $NEXT_URL"
+        echo "REL: $REL"
+        #echo $HEADERS
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
           echo $BODY
           exit 0
         fi
         echo "Sort the array of JSON objects in ascending order based on the created_at"
-        SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.created_at)')        
+        SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.created_at)') 
+        echo "SCAs: $SCA_DELIVERIES"        
         for DELIVERY in $(echo "${BODY}" | jq -r '.[] | @base64'); do
             _jq() {
               echo "${DELIVERY}" | base64 --decode | jq -r "${1}"
             }
             echo "++++++++++++++++++++++++++++++++++"
-            DELIVERY_ID=$(_jq '.html_url')
+            SAC_ALERT=$(_jq '.html_url')
 
             
             CREATED_AT=$(_jq '.created_at')
             OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
 
             if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
-              echo "Delivery ID $DELIVERY_ID is older than 24 hours. Skipping further process."
+              echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
               continue
             fi
-            echo "Delivery ID $DELIVERY_ID is not older than 24 hours"
+            echo "SCAlert $SAC_ALERT is not older than 24 hours"
             SECRET=$(_jq '.secret_type')
             HTML_URL=$(_jq '.html_url')
             ALERT_NUMBER=$(_jq '.number')
