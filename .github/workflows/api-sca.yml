@@ -71,6 +71,8 @@ jobs:
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
           # Insert your code to be executed in each iteration here
+          API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=2&page=$i&state=open"
+          echo "API_URL: $API_URL"
           SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
           echo "Sort the array of JSON objects in ascending order based on the created_at"
