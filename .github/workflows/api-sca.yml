@@ -58,6 +58,20 @@ jobs:
           echo $SCAs
           exit 0
         fi
+        
+        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'page=' '{print $2}' | awk -F'&' '{print $1}')
+        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'page=' '{print $2}' | awk -F'&' '{print $1}')
+
+        echo "Page Value: $PAGE_VALUE"
+
+        # Convert PAGE_VALUE to an integer
+        PAGE_VALUE=$((PAGE_VALUE))
+
+        # Use a for loop to run a block of code n times (where n is PAGE_VALUE)
+        for ((i = 1; i <= PAGE_VALUE; i++)); do
+          echo "Running code for iteration $i"
+          # Insert your code to be executed in each iteration here
+        done
         echo "Sort the array of JSON objects in ascending order based on the created_at"
         SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')         
         for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
