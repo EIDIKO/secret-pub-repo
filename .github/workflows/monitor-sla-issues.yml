@@ -4,7 +4,7 @@ on:
   #schedule:
     #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
 jobs:
-  monitor-ssa-issue:
+  monitor-ssa-issues:
     runs-on: ubuntu-latest    
     steps:
     - name: Checkout code
@@ -93,14 +93,12 @@ jobs:
               OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
-                  echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"
-                  echo "Exiting workflow as remaining ISSUES are also older than 72 hrs"                  
+                  echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"                  
                 else
                   echo "Issue $ISSUE_URL is not older than 72 hours, hence excluding it"
                   continue                  
               fi
               
-
               REPO_NAME=$(_jq '.repository.name')
               FULL_REPO_NAME=$(_jq '.repository.full_name')
               echo $ISSUE_URL
