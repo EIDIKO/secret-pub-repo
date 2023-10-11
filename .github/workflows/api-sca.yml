@@ -48,8 +48,10 @@ jobs:
         
         if [ -z "$SECOND_URL" ]; then
             echo "SECOND_URL is null or empty"
+            PAGE_VALUE="1"
           else
             echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+            PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'&page=' '{print $2}' | awk -F'&' '{print $1}')
         fi
         
         
@@ -58,8 +60,6 @@ jobs:
           echo $SCAs
           exit 0
         fi
-        
-        PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'&page=' '{print $2}' | awk -F'&' '{print $1}')
 
 
         echo "Page Value: $PAGE_VALUE"
