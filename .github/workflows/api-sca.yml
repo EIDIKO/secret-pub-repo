@@ -54,7 +54,8 @@ jobs:
 
             if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
               echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
-              continue
+              echo "Exiting workflow as remaining SCA are also older than 24 hrs"
+              break
             fi
             echo "SCAlert $SAC_ALERT is not older than 24 hours"
             SECRET=$(_jq '.secret_type')
