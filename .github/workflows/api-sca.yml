@@ -29,6 +29,16 @@ jobs:
         echo "NEXT_URL: $NEXT_URL"
         echo "REL: $REL"
         #echo $HEADERS
+        if [ -z "$LINK_HEADER" ]; then
+            echo "LINK_HEADER is null or empty"
+          else
+            echo "LINK_HEADER is not null or empty: $LINK_HEADER"
+        fi
+        if [ -z "$NEXT_URL" ]; then
+            echo "NEXT_URL is null or empty"
+          else
+            echo "NEXT_URL is not null or empty: $NEXT_URL"
+        fi
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
           echo $SCAs
