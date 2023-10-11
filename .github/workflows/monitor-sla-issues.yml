@@ -1,0 +1,129 @@
+name: SLA Monitor SSAlert Issues & Update
+on:
+  workflow_dispatch
+  #schedule:
+    #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
+jobs:
+  monitor-ssa-issue:
+    runs-on: ubuntu-latest    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2    
+    - name: Monitor SSAlert Issues
+      id: monitor-ssa-issues
+      env:
+        HOOK_ID: ${{ vars.HOOK_ID }}
+      run: |
+        TOKEN="${{ secrets.MY_PAT }}"
+        BASE_URL="https://api.github.com"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/issues?per_page=100&page=1&state=open&direction=desc"
+        ISSUE_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+        HEADERS=$(echo "$ISSUE_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+        HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+        LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+        REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+        NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+        SCAs=$(echo "$ISSUE_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+        echo "Status: $HTTP_STATUS"
+        #echo "LINK: $LINK_HEADER"
+        echo "FIRST_URL: $NEXT_URL"
+        echo "FIRST_REL: $REL"
+        IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
+        SECOND_URL="${URL_ARRAY[1]}"
+        SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
+        echo "SECOND_URL: $SECOND_URL"
+        
+
+        if [ -z "$LINK_HEADER" ]; then
+            echo "LINK_HEADER is null or empty"
+          else
+            echo "LINK_HEADER is not null or empty and is: $LINK_HEADER"
+        fi
+        
+        if [ -z "$NEXT_URL" ]; then
+            echo "NEXT_URL is null or empty"
+          else
+            echo "NEXT_URL is not null or empty and is: $NEXT_URL"
+        fi
+        
+        if [ -z "$SECOND_URL" ]; then
+            echo "SECOND_URL is null or empty"
+            PAGE_VALUE="1"
+          else
+            echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+            PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'&page=' '{print $2}' | awk -F'&' '{print $1}')
+        fi
+        
+        
+        if [ "$HTTP_STATUS" != "200" ]; then
+          echo "No issues found or error in API response, exiting smoothly"
+          echo $SCAs
+          exit 0
+        fi
+
+
+        echo "Page Value: $PAGE_VALUE"
+
+        
+        PAGE_VALUE=$((PAGE_VALUE))
+
+        
+        for ((i = 1; i <= PAGE_VALUE; i++)); do
+          echo "Running code for iteration $i"
+          
+          API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/issues?per_page=100&page=$i&state=open&direction=desc"
+          echo "API_URL: $API_URL"
+          ISSUE_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+          ISSUES=$(echo "$ISSUE_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+          echo "Sort the array of JSON objects in ascending order based on the created_at"
+          SCA_DELIVERIES=$(echo "$ISSUES" | jq 'sort_by(.created_at)')         
+          for SCA in $(echo "${ISSUES}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo "${SCA}" | base64 --decode | jq -r "${1}"
+              }
+              echo "++++++++++++++++++++++++++++++++++"
+              ISSUE_URL=$(_jq '.html_url')
+              ISSUE_NUMBER=$(_jq '.number')
+              ISSUE_TITLE=$(_jq '.title')  
+              COMMENT_URL=$(_jq '.comments_url')  
+              ASS_LOGIN=$(_jq '.assignee.login')  
+              ASS_TYPE=$(_jq '.assignee.type')  
+              
+              CREATED_AT=$(_jq '.created_at')
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
+  
+              if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+                  echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"
+                  echo "Exiting workflow as remaining ISSUES are also older than 72 hrs"                  
+                else
+                  echo "Issue $ISSUE_URL is not older than 72 hours, hence excluding it"
+                  continue                  
+              fi
+              
+
+              REPO_NAME=$(_jq '.repository.name')
+              FULL_REPO_NAME=$(_jq '.repository.full_name')
+              echo $ISSUE_URL
+              echo $ISSUE_NUMBER
+              echo $ISSUE_TITLE
+              echo $ASS_LOGIN
+              echo $ASS_TYPE
+              echo $FULL_REPO_NAME
+              echo $HTML_URL
+              echo $REPO_NAME
+
+              
+              COMMENT_BODY="Dear @$ASS_LOGIN \n \
+                      It's been more than 3 days since the issue is opened, Kindly try to close it ASAP"
+              curl -X POST \
+                -u "$TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "$COMMENT_URL" \
+                -d '{
+                  "body": "'"$COMMENT_BODY"'"
+                }'                    
+          done
+        done          
+    - name: Issue Created
+      if: success()
+      run: echo "GitHub issue created successfully."
