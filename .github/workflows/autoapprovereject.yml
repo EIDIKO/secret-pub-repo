@@ -1,16 +1,11 @@
 name: Rejecct Repo Comment and Close Issue
-
 on:
-  #issues:
-    #types:
-      #- opened
   workflow_run:
     workflows: ["Request for Repo Creation"]
     types:
       - completed
-
 jobs:
-  reject_repo_request:
+  fetch-issue-details:
     runs-on: ubuntu-latest
     outputs:
       repo-url: ${{ steps.extract-issue-details.outputs.repo-url }}
@@ -42,23 +37,22 @@ jobs:
             COMMENTS_URL=$(echo "$ISSUES" | jq -r '.[0].comments_url')
             echo "::set-output name=repo-url::${ISSUE_URL}"
             echo "::set-output name=comments-url::${COMMENTS_URL}"
-            echo "$ISSUE_URL $COMMENTS_URL"
+            echo "$ISSUE_URL :: $COMMENTS_URL"
           fi
-  approve_repo_request:
-    needs: [reject_repo_request]
+  reject_and_close_issue:
+    needs: [fetch-issue-details]
     runs-on: ubuntu-latest
     steps:
       - name: Update Issue with Rejection Comments
         id: rejection-comment
         run: |
           TOKEN="${{ secrets.MY_PAT }}"
-          echo "COMMENT_URL: ${{ needs.reject_repo_request.outputs.comments-url }}"
-          echo "REPO_URL: ${{ needs.reject_repo_request.outputs.repo-url }}"
+          echo "COMMENT_URL: ${{ needs.fetch-issue-details.outputs.comments-url }}"
           COMMENT_BODY="The Repo request has been rejected! \n\n Closing this issue."
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            "${{ needs.reject_repo_request.outputs.comments-url }}" \
+            "${{ needs.fetch-issue-details.outputs.comments-url }}" \
             -d '{
               "body": "'"$COMMENT_BODY"'"
             }'        
@@ -66,11 +60,11 @@ jobs:
         id: close-issue
         run: |
           TOKEN="${{ secrets.MY_PAT }}"
-          echo "repo-url: ${{ needs.reject_repo_request.outputs.repo-url }}"
+          echo "repo-url: ${{ needs.fetch-issue-details.outputs.repo-url }}"
           curl -X PATCH \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            "${{ needs.reject_repo_request.outputs.repo-url }}" \
+            "${{ needs.fetch-issue-details.outputs.repo-url }}" \
             -d '{
               "state": "closed"
             }'
