@@ -16,7 +16,7 @@ jobs:
       run: |
         TOKEN="${{ secrets.MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=100&page=1&state=open"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=2&page=1&state=open"
         SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
@@ -71,63 +71,65 @@ jobs:
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
           # Insert your code to be executed in each iteration here
-        done
-        echo "Sort the array of JSON objects in ascending order based on the created_at"
-        SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')         
-        for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
-            _jq() {
-              echo "${SCA}" | base64 --decode | jq -r "${1}"
-            }
-            echo "++++++++++++++++++++++++++++++++++"
-            SAC_ALERT=$(_jq '.html_url')
-
-            
-            CREATED_AT=$(_jq '.created_at')
-            OLDEST_ALLOWED_TIMESTAMP=$(date -d '9000 hours ago' --rfc-3339=seconds)
-
-            if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
-              echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
-              echo "Exiting workflow as remaining SCAs are also older than 24 hrs"
-              break
-            fi
-            echo "SCAlert $SAC_ALERT is not older than 24 hours"
-            SECRET=$(_jq '.secret_type')
-            HTML_URL=$(_jq '.html_url')
-            ALERT_NUMBER=$(_jq '.number')
-            LOCATIONS_URL=$(_jq '.locations_url')
-            REPO_NAME=$(_jq '.repository.name')
-            FULL_REPO_NAME=$(_jq '.repository.full_name')
-            echo $SECRET
-            echo $LOCATIONS_URL
-            echo $FULL_REPO_NAME
-            echo $HTML_URL
-            echo $REPO_NAME
-            echo $ALERT_NUMBER
-            # Get Locations using API
-            LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
-            echo $LOCATIONS
-            COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
-            echo $COMMIT_URL
-            # Get Commiter details using API
-            COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
-            #echo $COMMITS
-            # Get Auther Email using API
-            AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
-            if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
-              login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
-              echo $login_user
-            else
-              echo $AUTH_EMAIL
-              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
-              #echo $COMMITS_AUTH_DETAILS
-              # Get Auther Username using API
-              login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
-            fi
-            echo $login_user            
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
-            echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
-            echo "++++++++++++++++++++++++++++++++++"         
-        done    
+          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+          SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+          echo "Sort the array of JSON objects in ascending order based on the created_at"
+          SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')         
+          for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo "${SCA}" | base64 --decode | jq -r "${1}"
+              }
+              echo "++++++++++++++++++++++++++++++++++"
+              SAC_ALERT=$(_jq '.html_url')
+  
+              
+              CREATED_AT=$(_jq '.created_at')
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '9000 hours ago' --rfc-3339=seconds)
+  
+              if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+                echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
+                echo "Exiting workflow as remaining SCAs are also older than 24 hrs"
+                break
+              fi
+              echo "SCAlert $SAC_ALERT is not older than 24 hours"
+              SECRET=$(_jq '.secret_type')
+              HTML_URL=$(_jq '.html_url')
+              ALERT_NUMBER=$(_jq '.number')
+              LOCATIONS_URL=$(_jq '.locations_url')
+              REPO_NAME=$(_jq '.repository.name')
+              FULL_REPO_NAME=$(_jq '.repository.full_name')
+              echo $SECRET
+              echo $LOCATIONS_URL
+              echo $FULL_REPO_NAME
+              echo $HTML_URL
+              echo $REPO_NAME
+              echo $ALERT_NUMBER
+              # Get Locations using API
+              LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
+              echo $LOCATIONS
+              COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
+              echo $COMMIT_URL
+              # Get Commiter details using API
+              COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
+              #echo $COMMITS
+              # Get Auther Email using API
+              AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
+              if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
+                login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
+                echo $login_user
+              else
+                echo $AUTH_EMAIL
+                COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
+                #echo $COMMITS_AUTH_DETAILS
+                # Get Auther Username using API
+                login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
+              fi
+              echo $login_user            
+              ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+              echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              echo "++++++++++++++++++++++++++++++++++"         
+          done
+        done          
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
