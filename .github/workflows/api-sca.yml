@@ -37,6 +37,7 @@ jobs:
           echo $BODY
           exit 0
         fi
+        echo "SCAs Before: $BODY"
         echo "Sort the array of JSON objects in ascending order based on the created_at"
         SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.created_at)') 
         echo "SCAs: $SCA_DELIVERIES"        
