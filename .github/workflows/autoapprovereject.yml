@@ -12,14 +12,18 @@ on:
 jobs:
   reject_repo_request:
     runs-on: ubuntu-latest
+    outputs:
+      repo-url: ${{ steps.extract-issue-details.outputs.repo-url }}
+      comments-url: ${{ steps.extract-issue-details.outputs.comments-url}}
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     environment: 
       name: dev
       url: "${{ github.event.issue.html_url  }}"
     steps:
-      - name: Auto-reject
+      - name: Extract Issue Details
+        id: extract-issue-details
         run: |
-          LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
+          #LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
           #LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
           REPO_NAME="${{ github.repository }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
@@ -27,7 +31,43 @@ jobs:
           echo "LOCATIONS_URL: $LOCATIONS_URL"
           ISSUES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/issues?labels=${{ github.event.workflow_run.id }}")
           #echo $ISSUES
-          ISSUE_URL=$(echo "$ISSUES" | jq -r '.[0].url')
-          echo $ISSUE_URL
+          is_empty=$(echo "$ISSUES" | jq 'length == 0')
+
+          if [ "$is_empty" == "true" ]; then
+            echo "The array is empty."
+            exit 0
+          else
+            echo "The array is not empty."
+            ISSUE_URL=$(echo "$ISSUES" | jq -r '.[0].url')
+            COMMENTS_URL=$(echo "$ISSUES" | jq -r '.[0].comments_url')
+            echo "::set-output name=repo-url::${ISSUE_URL}"
+            echo "::set-output name=comments-url::${COMMENTS_URL}"
+            echo "$ISSUE_URL $COMMENTS_URL"
+          fi
+      - name: Update Issue with Rejection Comments
+        id: rejection-comment
+        run: |
+          TOKEN="${{ secrets.MY_PAT }}"
+          echo "COMMENT_URL: ${{ needs.reject_repo_request.outputs.comments-url }}"
+          COMMENT_BODY="The Repo request has been rejected! \n\n Closing this issue."
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "${{ needs.reject_repo_request.outputs.comments-url }}" \
+            -d '{
+              "body": "'"$COMMENT_BODY"'"
+            }'        
+      - name: Close Issue
+        id: close-issue
+        run: |
+          TOKEN="${{ secrets.MY_PAT }}"
+          echo "repo-url: ${{ needs.reject_repo_request.outputs.repo-url }}"
+          curl -X PATCH \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "${{ needs.reject_repo_request.outputs.repo-url }}" \
+            -d '{
+              "state": "closed"
+            }'
           
           
