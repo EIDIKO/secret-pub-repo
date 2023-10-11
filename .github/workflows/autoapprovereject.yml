@@ -44,6 +44,10 @@ jobs:
             echo "::set-output name=comments-url::${COMMENTS_URL}"
             echo "$ISSUE_URL $COMMENTS_URL"
           fi
+  approve_repo_request:
+    needs: [reject_repo_request]
+    runs-on: ubuntu-latest
+    steps:
       - name: Update Issue with Rejection Comments
         id: rejection-comment
         run: |
