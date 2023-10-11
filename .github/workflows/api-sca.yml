@@ -25,24 +25,34 @@ jobs:
         NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
         SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
         echo "Status: $HTTP_STATUS"
-        echo "LINK: $LINK_HEADER"
+        #echo "LINK: $LINK_HEADER"
+        echo "FIRST_URL: $NEXT_URL"
+        echo "FIRST_REL: $REL"
         IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
         SECOND_URL="${URL_ARRAY[1]}"
         SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
-        echo "Second URL: $SECOND_URL"
-        echo "NEXT_URL: $NEXT_URL"
-        echo "REL: $REL"
-        #echo $HEADERS
+        echo "SECOND_URL: $SECOND_URL"
+        
+
         if [ -z "$LINK_HEADER" ]; then
             echo "LINK_HEADER is null or empty"
           else
-            echo "LINK_HEADER is not null or empty: $LINK_HEADER"
+            echo "LINK_HEADER is not null or empty and is: $LINK_HEADER"
         fi
+        
         if [ -z "$NEXT_URL" ]; then
             echo "NEXT_URL is null or empty"
           else
-            echo "NEXT_URL is not null or empty: $NEXT_URL"
+            echo "NEXT_URL is not null or empty and is: $NEXT_URL"
         fi
+        
+        if [ -z "$SECOND_URL" ]; then
+            echo "SECOND_URL is null or empty"
+          else
+            echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+        fi
+        
+        
         if [ "$HTTP_STATUS" != "200" ]; then
           echo "No deliveries found or error in API response, exiting smoothly"
           echo $SCAs
