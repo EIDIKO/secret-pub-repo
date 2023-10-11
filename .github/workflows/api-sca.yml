@@ -86,7 +86,7 @@ jobs:
   
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d '9000 hours ago' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
                 echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
