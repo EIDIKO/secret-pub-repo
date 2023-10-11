@@ -20,25 +20,14 @@ jobs:
       - name: Auto-reject
         run: |
           LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
-          LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
-          echo "BID ${{ needs.review_repo_request.outputs.issue-number }}"
-          echo "NAME ${{ needs.review_repo_request.outputs.repo-name }}"
-          echo "OWNER ${{ needs.review_repo_request.outputs.repo-owner }}"
-          echo "DESC ${{ needs.review_repo_request.outputs.repo-desc }}"
-
-          echo "Auto-rejecting \n $LOCATIONS"
-          echo "${{ toJson(github.event.workflow_run) }}"
-          
-          echo ${{needs.review_repo_request.outputs.issue-url}}
-          echo "Workflow Run ID: ${{ github.event.workflow_run.id }}"
+          #LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
+          LABEL = "${{ github.event.workflow_run.id }}"
+          REPO_NAME="${{ github.repository }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
-          echo "Event: ${{ github.event.workflow_run.event }}"
-          echo "Status: ${{ github.event.workflow_run.status }}"
-          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Created At: ${{ github.event.workflow_run.created_at }}"
-          echo "Updated At: ${{ github.event.workflow_run.updated_at }}"
-          echo "Head Commit: ${{ github.event.workflow_run.head_commit }}"
-          echo "Repository: ${{ github.event.workflow_run.repository }}"
-          echo "Head Repository: ${{ github.event.workflow_run.head_repository }}"
-          echo "Actor: ${{ github.event.workflow_run.actor }}"
-          echo "Sender: ${{ github.event.workflow_run.sender }}"
+          echo "REPO: $REPO_NAME"
+          echo "LABEL-run-id: $LABEL"
+          cho "LOCATIONS_URL: $LOCATIONS_URL"
+          ISSUES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/issues?labels=$LABEL")
+          echo $ISSUES
+          
+          
