@@ -21,13 +21,13 @@ jobs:
         run: |
           LOCATIONS_URL="${{ github.event.workflow_run.jobs_url }}"
           #LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
-          LABEL = "${{ github.event.workflow_run.id }}"
+          #LABEL_NO= "${{ github.event.workflow_run.id }}"
           REPO_NAME="${{ github.repository }}"
           echo "Workflow Name: ${{ github.event.workflow_run.name }}"
           echo "REPO: $REPO_NAME"
           echo "LABEL-run-id: $LABEL"
           cho "LOCATIONS_URL: $LOCATIONS_URL"
-          ISSUES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/issues?labels=$LABEL")
+          ISSUES=$(curl -s -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/issues?labels=${{ github.event.workflow_run.id }}")
           echo $ISSUES
           
           
