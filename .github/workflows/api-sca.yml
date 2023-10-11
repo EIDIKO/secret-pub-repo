@@ -16,7 +16,7 @@ jobs:
       run: |
         TOKEN="${{ secrets.MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=100&page=1&state=open"
+        API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=5&page=1&state=open"
         SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
         HEADERS=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
         HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
@@ -55,7 +55,7 @@ jobs:
 
             
             CREATED_AT=$(_jq '.created_at')
-            OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
+            OLDEST_ALLOWED_TIMESTAMP=$(date -d '9000 hours ago' --rfc-3339=seconds)
 
             if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
               echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
