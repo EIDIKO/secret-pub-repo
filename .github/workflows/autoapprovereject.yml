@@ -9,11 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       repo-url: ${{ steps.extract-issue-details.outputs.repo-url }}
+      repo-html-url: ${{ steps.extract-issue-details.outputs.repo-html-url }}
       comments-url: ${{ steps.extract-issue-details.outputs.comments-url}}
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     environment: 
       name: dev
-      url: ${{ steps.extract-issue-details.outputs.repo-url }}
+      url: ${{ steps.extract-issue-details.outputs.repo-html-url }}
     steps:
       - name: Extract Issue Details
         id: extract-issue-details
@@ -34,8 +35,10 @@ jobs:
           else
             echo "The array is not empty."
             ISSUE_URL=$(echo "$ISSUES" | jq -r '.[0].url')
+            ISSUE_HTML_URL=$(echo "$ISSUES" | jq -r '.[0].html_url')
             COMMENTS_URL=$(echo "$ISSUES" | jq -r '.[0].comments_url')
             echo "::set-output name=repo-url::${ISSUE_URL}"
+            echo "::set-output name=repo-html-url::${ISSUE_HTML_URL}"
             echo "::set-output name=comments-url::${COMMENTS_URL}"
             echo "$ISSUE_URL :: $COMMENTS_URL"
           fi
@@ -44,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: dev
-      url: ${{ needs.fetch-issue-details.outputs.comments-url }}
+      url: ${{ needs.fetch-issue-details.outputs.repo-html-url }}
     steps:
       - name: Update Issue with Rejection Comments
         id: rejection-comment
