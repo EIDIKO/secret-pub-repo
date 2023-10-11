@@ -49,6 +49,7 @@ jobs:
         run: |
           TOKEN="${{ secrets.MY_PAT }}"
           echo "COMMENT_URL: ${{ needs.reject_repo_request.outputs.comments-url }}"
+          echo "REPO_URL: ${{ needs.reject_repo_request.outputs.repo-url }}"
           COMMENT_BODY="The Repo request has been rejected! \n\n Closing this issue."
           curl -X POST \
             -u "$TOKEN" \
