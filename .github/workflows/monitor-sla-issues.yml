@@ -115,8 +115,8 @@ jobs:
               COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
               
               CREATED_AT=$(_jq '.created_at')
-              7D_OLDEST_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
-              if [ "$CREATED_AT" \< "$7D_OLDEST_TIMESTAMP" ]; then
+              OLDEST_7D_TIMESTAMP=$(date -d '168 hours ago' --rfc-3339=seconds)
+              if [ "$CREATED_AT" \< "$OLDEST_7D_TIMESTAMP" ]; then
                   let "ISSUE_COUNT_7D_OLD+=1"
                   echo "Issue $ISSUE_URL is 7D older"                                   
               fi
