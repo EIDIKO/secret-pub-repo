@@ -133,7 +133,7 @@ jobs:
               echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
               echo "++++++++++++++++++++++++++++++++++"         
           done
-          if [ "$BREAK_FLAG" == "BREAKK" ]; then
+          if [ "$BREAK_FLAG" == "BREAK" ]; then
             echo "Breaking External For loop"
             break
           fi
