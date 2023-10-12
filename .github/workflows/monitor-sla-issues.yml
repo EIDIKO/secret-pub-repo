@@ -77,6 +77,8 @@ jobs:
 
         
         PAGE_VALUE=$((PAGE_VALUE))
+        ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
+        COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
 
         
         for ((i = 1; i <= PAGE_VALUE; i++)); do
@@ -98,7 +100,13 @@ jobs:
               ISSUE_TITLE=$(_jq '.title')  
               COMMENT_URL=$(_jq '.comments_url')  
               ASS_LOGIN=$(_jq '.assignee.login')  
-              ASS_TYPE=$(_jq '.assignee.type')  
+              ASS_TYPE=$(_jq '.assignee.type')
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$ISSUE_NUMBER}"
+              issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
+             issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
+             issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
+             issue_data="${issue_data//ASS_TYPE/$ASS_TYPE}"
+             COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data\n"
               
               CREATED_AT=$(_jq '.created_at')
               OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
@@ -132,7 +140,15 @@ jobs:
                   "body": "'"$COMMENT_BODY"'"
                 }'                    
           done
-        done          
+        done
+        echo "COMMENT_BODY_MD $COMMENT_BODY_MD"
+        curl -X POST \
+                -u "$TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249/comments" \
+                -d '{
+                  "body": "'"$COMMENT_BODY_MD"'"
+                }'   
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
