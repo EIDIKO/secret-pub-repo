@@ -117,13 +117,13 @@ jobs:
               CREATED_AT=$(_jq '.created_at')
               7D_OLDEST_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
               if [ "$CREATED_AT" \< "$7D_OLDEST_TIMESTAMP" ]; then
-                  et "ISSUE_COUNT_7D_OLD+=1"
+                  let "ISSUE_COUNT_7D_OLD+=1"
                   echo "Issue $ISSUE_URL is 7D older"                                   
               fi
               OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
-                  et "ISSUE_COUNT_3D_OLD+=1"
+                  let "ISSUE_COUNT_3D_OLD+=1"
                   echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"                  
                 else
                   echo "Issue $ISSUE_URL is not older than 72 hours, hence excluding it"
