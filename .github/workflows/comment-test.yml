@@ -1,0 +1,26 @@
+name: SLA Monitor SSAlert Issues & Update
+on:
+  workflow_dispatch
+
+jobs:
+  monitor-ssa-issue:
+    runs-on: ubuntu-latest    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2    
+    - name: Monitor SSAlert Issues
+      id: monitor-ssa-issues
+      env:
+        HOOK_ID: ${{ vars.HOOK_ID }}
+      run: |
+        TOKEN="${{ secrets.MY_PAT }}"         
+              COMMENT_CONTENT=$(<comment.md)
+              curl -X POST \
+                -u "$TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249/comments" \
+                -d "{\"body\": \"$COMMENT_CONTENT\"}"                    
+        
+    - name: Issue Created
+      if: success()
+      run: echo "GitHub issue created successfully."
