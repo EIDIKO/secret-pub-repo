@@ -76,10 +76,12 @@ jobs:
         echo "Page Value: $PAGE_VALUE"
 
         ISSUE_COUNT=0
+        ISSUE_COUNT_3D_OLD=0
+        ISSUE_COUNT_7D_OLD=0
         PAGE_VALUE=$((PAGE_VALUE))
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
-        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|\n|------------|---------|\n|OPEN|ISSUE_COUNT_VAL|"
+        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
         
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
@@ -105,7 +107,7 @@ jobs:
               ASS_TYPE=$(_jq '.assignee.type')
               REPO_URL=$(_jq '.repository_url')
               REPO_URL=$(echo "$REPO_URL" | sed 's|.*/\([^/]*\)$|\1|')
-              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL$ISSUE_NUMBER}"
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL-$ISSUE_NUMBER}"
               issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
               issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
               issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
@@ -113,9 +115,15 @@ jobs:
               COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d '1 hours ago' --rfc-3339=seconds)
+              7D_OLDEST_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
+              if [ "$CREATED_AT" \< "$7D_OLDEST_TIMESTAMP" ]; then
+                  et "ISSUE_COUNT_7D_OLD+=1"
+                  echo "Issue $ISSUE_URL is 7D older"                                   
+              fi
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+                  et "ISSUE_COUNT_3D_OLD+=1"
                   echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"                  
                 else
                   echo "Issue $ISSUE_URL is not older than 72 hours, hence excluding it"
@@ -146,7 +154,8 @@ jobs:
           done
         done
         COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_COUNT_VAL/$ISSUE_COUNT}"
-                
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//3DAYS_OLD_VAL/$ISSUE_COUNT_3D_OLD}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//7DAYS_OLD_VAL/$ISSUE_COUNT_7D_OLD}"
         curl -X POST \
                -u "$TOKEN" \
                -H "Accept: application/vnd.github.v3+json" \
