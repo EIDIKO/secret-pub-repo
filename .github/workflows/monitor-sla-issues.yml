@@ -75,11 +75,11 @@ jobs:
 
         echo "Page Value: $PAGE_VALUE"
 
-        
+        ISSUE_COUNT=0
         PAGE_VALUE=$((PAGE_VALUE))
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
-
+        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|\n|------------|---------|\n|OPEN|ISSUE_COUNT_VAL|"
         
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
@@ -95,6 +95,7 @@ jobs:
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
               }
               echo "++++++++++++++++++++++++++++++++++"
+              ((ISSUE_COUNT++))
               ISSUE_URL=$(_jq '.html_url')
               ISSUE_NUMBER=$(_jq '.number')
               ISSUE_TITLE=$(_jq '.title')  
@@ -141,14 +142,22 @@ jobs:
                 }'                    
           done
         done
-        echo "COMMENT_BODY_MD $COMMENT_BODY_MD"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_NUMBER/$ISSUE_COUNT}"
+                
+        curl -X POST \
+               -u "$TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249/comments" \
+               -d '{
+                 "body": "'"$COMMENT_BODY_ISSUES"'"
+                }'
         curl -X POST \
                 -u "$TOKEN" \
                 -H "Accept: application/vnd.github.v3+json" \
                 "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249/comments" \
                 -d '{
                   "body": "'"$COMMENT_BODY_MD"'"
-                }'   
+                }'
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
