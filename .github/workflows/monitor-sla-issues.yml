@@ -142,7 +142,7 @@ jobs:
                 }'                    
           done
         done
-        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_NUMBER/$ISSUE_COUNT}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_COUNT_VAL/$ISSUE_COUNT}"
                 
         curl -X POST \
                -u "$TOKEN" \
