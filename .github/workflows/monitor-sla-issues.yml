@@ -113,7 +113,7 @@ jobs:
               COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d '72 hours ago' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '1 hours ago' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
                   echo "Issue $ISSUE_URL is older than 72 hours. hence taking it into account"                  
