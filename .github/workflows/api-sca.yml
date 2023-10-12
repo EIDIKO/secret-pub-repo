@@ -32,6 +32,7 @@ jobs:
         SECOND_URL="${URL_ARRAY[1]}"
         SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
         echo "SECOND_URL: $SECOND_URL"
+        BREAK_FLAG="DONT_BREAK"
         
 
         if [ -z "$LINK_HEADER" ]; then
@@ -91,6 +92,7 @@ jobs:
               if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
                 echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
                 echo "Exiting workflow as remaining SCAs are also older than 24 hrs"
+                BREAK_FLAG="BREAK"
                 break
               fi
               echo "SCAlert $SAC_ALERT is not older than 24 hours"
@@ -131,6 +133,10 @@ jobs:
               echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
               echo "++++++++++++++++++++++++++++++++++"         
           done
+          if [ "$BREAK_FLAG" == "BREAK" ]; then
+            echo "Breaking External For loop"
+            break
+          fi
         done          
     - name: Issue Created
       if: success()
