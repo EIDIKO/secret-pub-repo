@@ -81,7 +81,7 @@ jobs:
         PAGE_VALUE=$((PAGE_VALUE))
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
-        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
+        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
         
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
