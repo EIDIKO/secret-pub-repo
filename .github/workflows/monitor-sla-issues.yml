@@ -95,14 +95,17 @@ jobs:
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
               }
               echo "++++++++++++++++++++++++++++++++++"
-              ISSUE_COUNT=$((ISSUE_COUNT++))
+              let "ISSUE_COUNT+=1"
+              echo "---------------------------------"
               ISSUE_URL=$(_jq '.html_url')
               ISSUE_NUMBER=$(_jq '.number')
               ISSUE_TITLE=$(_jq '.title')  
               COMMENT_URL=$(_jq '.comments_url')  
               ASS_LOGIN=$(_jq '.assignee.login')  
               ASS_TYPE=$(_jq '.assignee.type')
-              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$ISSUE_NUMBER}"
+              REPO_URL=$(_jq '.repository_url')
+              REPO_URL=$(echo "$REPO_URL" | sed 's|.*/\([^/]*\)$|\1|')
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL$ISSUE_NUMBER}"
               issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
               issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
               issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
