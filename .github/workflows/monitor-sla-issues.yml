@@ -107,7 +107,7 @@ jobs:
               ASS_TYPE=$(_jq '.assignee.type')
               REPO_URL=$(_jq '.repository_url')
               REPO_URL=$(echo "$REPO_URL" | sed 's|.*/\([^/]*\)$|\1|')
-              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL-$ISSUE_NUMBER}"
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL#$ISSUE_NUMBER}"
               issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
               issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
               issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
