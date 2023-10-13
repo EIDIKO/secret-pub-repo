@@ -1,0 +1,118 @@
+name: YAML Repository Request
+description: "Request the creation of a new repository"
+title: "Enter Tilte here"
+#lables:  ["Repo Request"]
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists for the repo creation.
+    options:
+    - label: I have searched the existing issues, No issue created.
+      required: true
+- type: markdown
+  attributes:
+    value: "## Kelloggcompany Repository Request!!!"
+
+
+
+    
+- type: textarea
+  attributes:
+    label: NAME OF REPOSITORY
+    description: Provide a clear and concise name for the repository
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: PURPOSE OF REPOSITORY
+    description: Explain the purpose and goals of this repository
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: TEAM OR INDIVIDUAL REQUSTIN
+    description: Name of the requesting team or individual
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: PRIMARY CONTACT
+    description: Provide the primary contact person's name and contact information
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: REPOSITORY DESCRIPTION
+    description: Provide a detailed description of the repository, including its intended use, project objectives, and any relevant context. Be as specific as possible.
+  validations:
+    required: true
+
+- type: checkboxes
+  attributes:
+    label: ACCESS AND PERMISSION
+    description: Select one of the options above for the repository's access level.
+    options:
+    - label: Public Repository (Anyone can access)
+    - label: Private Repository (Restricted access)
+      required: true
+
+- type: textarea
+  attributes:
+    label: ACCESS CONTROL
+    description: Specify who should have access to the repository, including team members, collaborators, or specific individuals.
+  validations:
+    required: true
+
+- type: checkboxes
+  attributes:
+    label: BRANCHING STRATEGY
+    description: Choose the branching strategy for the repository or specify if it follows a custom strategy.
+    options:
+    - label: Single Branch (e.g., main, master)
+    - label: Feature Branching
+    - label: Gitflow (feature, develop, release, hotfix
+    - label: Other (Please specify)
+      required: true
+
+- type: checkboxes
+  attributes:
+    label: COLLABORATORS
+    description: Choose whether you require approval for adding collaborators to the repository.
+    options:
+    - label: Require approval for adding collaborators
+    - label: Allow team members to add collaborators without approval
+      required: true
+
+- type: textarea
+  attributes:
+    label: SECURITY AND COMPLIANCE
+    description: Outline any security, compliance, or regulatory requirements that need to be addressed in this repository.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: ADDITIONAL NOTES
+    description: Include any additional information, notes, or special instructions related to this repository request.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: CICD AND AUTOMATION
+    description: Describe any continuous integration and continuous deployment CICD pipelines, automation scripts, or configuration needed for this repository.
+  validations:
+    required: true
+
+- type: checkboxes
+  attributes:
+    label: DONE
+    description: By submitting this request, I acknowledge that I have read and understood the organization's policies and guidelines regarding repository creation and management.
+    options:
+    - label: I Confirm
+      required: true
