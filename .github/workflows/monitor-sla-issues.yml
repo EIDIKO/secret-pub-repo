@@ -5,7 +5,10 @@ on:
     #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
 jobs:
   monitor-ssa-issues:
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest 
+    environment: 
+      name: dev
+      url: "https://github.com/EIDIKO/secret-pub-repo/issues/249"
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
