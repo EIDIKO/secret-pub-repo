@@ -21,6 +21,7 @@ body:
   attributes:
     label: NAME OF REPOSITORY
     description: Provide a clear and concise name for the repository
+    value: Sample Data
   validations:
     required: true
 
