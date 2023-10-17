@@ -1,4 +1,4 @@
-name: Inline Script
+name: Inline Script & Code Reuse
 on:
   workflow_dispatch
 jobs:
@@ -10,7 +10,7 @@ jobs:
     - name: Checkout code
       id: first_job_step1
       uses: actions/checkout@v2   
-    - name: Test Inline to Ext Script
+    - name: Test Inline 
       id: first_job_step2
       run: |        
         TOKEN="${{ secrets.MY_PAT }}"
@@ -36,10 +36,8 @@ jobs:
     - name: Checkout code
       id: second_job_step1
       uses: actions/checkout@v2   
-    - name: Test updated Inline to Ext Script
+    - name: Test Updated Inline 
       id: second_job_step2 
-      env:
-        BASE_URL: ${{ vars.BASE_URL }}
       run: |
         TOKEN="${{ secrets.MY_PAT }}"
         BASE_URL="${{ vars.BASE_URL }}"
@@ -56,4 +54,4 @@ jobs:
         SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKENT" "$API_URL")
         echo "::set-output name=owner::${ORG_OR_OWNER}"
         echo "Job Output(ORGOROWNER): $ORGOROWNER"
-        #echo $SCA_API_RESPONSEh
+        #echo $SCA_API_RESPONSE
