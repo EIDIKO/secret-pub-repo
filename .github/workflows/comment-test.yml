@@ -15,8 +15,4 @@ jobs:
         TOKENT: ${{ secrets.MY_PAT }}
       run: |
         chmod +x scripts/comment.sh
-        ./scripts/comment.sh                   
-        
-    - name: Issue Created
-      if: success()
-      run: echo "GitHub i
+        ./scripts/comment.sh
