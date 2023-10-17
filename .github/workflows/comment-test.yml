@@ -13,6 +13,9 @@ jobs:
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         TOKENT: ${{ secrets.MY_PAT }}
+        REPO_NAME: ${{ github.repository }}
+        ORG_OR_OWNER: ${{ github.repository_owner }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
