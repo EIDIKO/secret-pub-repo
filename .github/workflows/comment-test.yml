@@ -22,3 +22,19 @@ jobs:
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
+  update-issue-comment:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2   
+    - name: Test Comment
+      id: test-issue-comment
+      env:
+        HOOK_ID: ${{ vars.HOOK_ID }}
+        TOKENT: ${{ secrets.MY_PAT }}
+        REPO_NAME: ${{ github.repository }}
+        ORG_OR_OWNER: ${{ github.repository_owner }}
+        ISSUE_NUMBER: ${{ needs.test-issue-comment.outputs.issue-number }} 
+      run: |
+        chmod +x scripts/comment.sh
+        ./scripts/comment.sh
