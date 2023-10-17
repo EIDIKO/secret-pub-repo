@@ -10,5 +10,6 @@ SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKENT" "$API_URL")
 echo "::set-output name=owner::${ORG_OR_OWNER}"
 echo "Job Output(ORGOROWNER): $ORGOROWNER"
 #echo $SCA_API_RESPONSE
+printenv
    
 
