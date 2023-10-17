@@ -1,3 +1,3 @@
 #!/bin/bash
 TOKEN="${{ secrets.MY_PAT }}"         
-echo "Testing scripts"
+echo "Testing scripts $TOKEN"
