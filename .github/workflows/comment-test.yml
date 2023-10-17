@@ -5,7 +5,7 @@ jobs:
   first_job:
     runs-on: ubuntu-latest
     outputs:
-      issue-number: ${{ steps.step-output.outputs.owner }}
+      issue-number: ${{ steps.first_job_step2.outputs.owner }}
     steps:
     - name: Checkout code
       id: first_job_step1
