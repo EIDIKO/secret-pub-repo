@@ -5,7 +5,7 @@ jobs:
   first_job:
     runs-on: ubuntu-latest
     outputs:
-      issue-number: ${{ steps.step-output.outputs.issue-number }}
+      issue-number: ${{ steps.step-output.outputs.owner }}
     steps:
     - name: Checkout code
       id: first_job_step1
@@ -15,10 +15,10 @@ jobs:
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         BASE_URL: ${{ vars.BASE_URL }}
-        TOKENT: ${{ secrets.MY_PAT }}
+        TOKEN: ${{ secrets.MY_PAT }}
         REPO_NAME: ${{ github.repository }}
         ORG_OR_OWNER: ${{ github.repository_owner }} 
-        ISSUE_NUMBER: ${{ steps.first_job_step2.outputs.issue-number }}
+        ORGOROWNER: ${{ steps.first_job_step2.outputs.owner }}
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
@@ -34,10 +34,10 @@ jobs:
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         BASE_URL: ${{ vars.BASE_URL }}
-        TOKENT: ${{ secrets.MY_PAT }}
+        TOKEN: ${{ secrets.MY_PAT }}
         REPO_NAME: ${{ github.repository }}
         ORG_OR_OWNER: ${{ github.repository_owner }}
-        ISSUE_NUMBER: ${{ needs.first_job.outputs.issue-number }} 
+        ORGOROWNER: ${{ needs.first_job.outputs.owner }} 
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
