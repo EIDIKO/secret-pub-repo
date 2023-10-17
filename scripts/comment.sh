@@ -7,6 +7,6 @@ echo $API_URL
 SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKENT" "$API_URL")
 echo "::set-output name=issue-number::${ORG_OR_OWNER}"
 echo "IS $ISSUE_NUMBER"
-echo $SCA_API_RESPONSE
+#echo $SCA_API_RESPONSE
    
 
