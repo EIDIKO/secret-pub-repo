@@ -28,7 +28,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2   
     - name: Test Comment
-      id: test-issue-comment
+      id: update-issue-comment
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         TOKENT: ${{ secrets.MY_PAT }}
