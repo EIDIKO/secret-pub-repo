@@ -2,40 +2,42 @@ name: Inline to Ext Script POC
 on:
   workflow_dispatch
 jobs:
-  issue-comment:
+  first_job:
     runs-on: ubuntu-latest
     outputs:
-      issue-number: ${{ steps.test-issue-comment.outputs.issue-number }}
+      issue-number: ${{ steps.step-output.outputs.issue-number }}
     steps:
     - name: Checkout code
+      id: first_job_step1
       uses: actions/checkout@v2   
     - name: Test Inline to Ext Script
-      id: test-issue-comment
+      id: first_job_step2
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         BASE_URL: ${{ vars.BASE_URL }}
         TOKENT: ${{ secrets.MY_PAT }}
         REPO_NAME: ${{ github.repository }}
         ORG_OR_OWNER: ${{ github.repository_owner }} 
-        ISSUE_NUMBER: ${{ steps.test-issue-comment.outputs.issue-number }}
+        ISSUE_NUMBER: ${{ steps.first_job_step2.outputs.issue-number }}
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
-  update-issue-comment:
+  second_job:
     runs-on: ubuntu-latest
     needs: [issue-comment]
     steps:
     - name: Checkout code
+      id: second_job_step1
       uses: actions/checkout@v2   
     - name: Test updated Inline to Ext Script
-      id: update-issue-comment
+      id: second_job_step1
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
         BASE_URL: ${{ vars.BASE_URL }}
         TOKENT: ${{ secrets.MY_PAT }}
         REPO_NAME: ${{ github.repository }}
         ORG_OR_OWNER: ${{ github.repository_owner }}
-        ISSUE_NUMBER: ${{ needs.issue-comment.outputs.issue-number }} 
+        ISSUE_NUMBER: ${{ needs.first_job.outputs.issue-number }} 
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
