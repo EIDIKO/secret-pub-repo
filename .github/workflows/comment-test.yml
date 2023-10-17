@@ -13,7 +13,7 @@ jobs:
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
       run: |
-        chmod +x scripts/command1.sh
+        chmod +x scripts/comment.sh
         ./scripts/comment.sh                   
         
     - name: Issue Created
