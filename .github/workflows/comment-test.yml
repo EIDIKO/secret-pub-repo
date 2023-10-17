@@ -21,6 +21,7 @@ jobs:
         ./scripts/comment.sh
   update-issue-comment:
     runs-on: ubuntu-latest
+    needs: [issue-comment]
     steps:
     - name: Checkout code
       uses: actions/checkout@v2   
