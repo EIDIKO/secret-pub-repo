@@ -12,6 +12,7 @@ jobs:
       id: test-issue-comment
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
+        TOKENT: ${{ secrets.MY_PAT }}
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh                   
