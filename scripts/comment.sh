@@ -5,7 +5,7 @@ echo "Secret(Token): $TOKEN"
 echo "Env Variable(BASE_URL): $BASE_URL"
 echo "Context data(REPO_NAME): $REPO_NAME"
 echo "Context data(ORG_OR_OWNER): $ORG_OR_OWNER"
-echo $API_URL
+echo "Job Output(ORGOROWNER): $ORGOROWNER"
 SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKENT" "$API_URL")
 echo "::set-output name=owner::${ORG_OR_OWNER}"
 echo "Job Output(ORGOROWNER): $ORGOROWNER"
