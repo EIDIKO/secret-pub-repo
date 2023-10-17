@@ -5,6 +5,9 @@ BASE_URL="https://api.github.com"
 API_URL="$BASE_URL/orgs/$REPO_NAME/secret-scanning/alerts?per_page=100&page=1&state=open"
 echo $API_URL
 SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKENT" "$API_URL")
+echo "::set-output name=issue-number::${ORG_OR_OWNER}"
+echo ${{ steps.test-issue-comment.outputs.issue-number }}
+echo $ISSUE_NUMBER
 echo $SCA_API_RESPONSE
    
 
