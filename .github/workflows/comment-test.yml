@@ -1,7 +1,6 @@
 name: Test Issue Comment
 on:
   workflow_dispatch
-
 jobs:
   test-issue-comment:
     runs-on: ubuntu-latest
@@ -17,8 +16,7 @@ jobs:
         TOKENT: ${{ secrets.MY_PAT }}
         REPO_NAME: ${{ github.repository }}
         ORG_OR_OWNER: ${{ github.repository_owner }}
-        ISSUE_NUMBER: ${{ needs.test-issue-comment.outputs.issue-number }}
-        
+        ISSUE_NUMBER: ${{ needs.test-issue-comment.outputs.issue-number }}   
       run: |
         chmod +x scripts/comment.sh
         ./scripts/comment.sh
