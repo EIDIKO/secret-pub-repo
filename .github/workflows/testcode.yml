@@ -19,5 +19,7 @@ jobs:
         for section in "${sections[@]}"; do
           if [ -n "$section" ]; then
             echo "Section: $section"
+            extracted_data=$(echo "$section" | awk -F "\n\n" '{print $2}')
+            echo "extracted_data: $extracted_data"
           fi
         done
