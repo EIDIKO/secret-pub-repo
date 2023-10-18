@@ -26,7 +26,12 @@ jobs:
           echo $SCA_API_RESPONSE
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
           echo "TTT: $SCAs"
-          for file in SCAs; do
-            echo "file $file"
+          for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo "${SCA}" | base64 --decode | jq -r "${1}"
+              }
+              echo "++++++++++++++++++++++++++++++++++"
+              SAC_ALERT=$(_jq '.filename')
+              echo $SAC_ALERT
           done
           echo "ORG LEVEL WEBHOOK trigger"
