@@ -17,6 +17,7 @@ jobs:
       id: first_job_step2
       run: |
         echo "files ${{ github.event.pull_request.changed_files }}"
+        echo "${{ toJson(github.event.pull_request) }}"
         for file in ${{ github.event.pull_request.changed_files }}; do
             echo "file $file"
         done
