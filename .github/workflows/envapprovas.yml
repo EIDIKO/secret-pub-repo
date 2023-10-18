@@ -60,7 +60,7 @@ jobs:
           echo "${{ github.event.issue.body }}" >> file.txt
           echo "2"
           data=$(awk '/###/{flag=1; next} /###/{flag=0} flag' file.txt)
-          echo $data >> data.txt
+          echo "$data" >> data.txt
           content=$(data.txt)
           IFS=$'\n' read -rd '' -a lines <<< "$content"
           echo "4"
