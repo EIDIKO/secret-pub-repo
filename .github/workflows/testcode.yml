@@ -14,7 +14,7 @@ jobs:
       id: first_job_step2
       run: |
         issue_body="### Is there an existing issue for this?\n\n- [X] I have searched the existing issues, No issue created.\n\n### Template\n\nKellogg Basic\n\n### NAME OF REPOSITORY\n\nadd here\n\n### PURPOSE OF REPOSITORY\n\nadd here\n\n### TEAM OR INDIVIDUAL REQUEST\n\nadd here\n\n### PRIMARY CONTACT\n\nadd here\n\n### REPOSITORY DESCRIPTION\n\nadd here\n\n### ACCESS AND PERMISSION\n\nPublic Repository (Anyone can access)\n\n### Add a README file\n\nYes\n\n### ACCESS CONTROL\n\nadd here\n\n### BRANCHING STRATEGY\n\n_No response_\n\n### COLLABORATORS\n\nRequire approval for adding collaborators\n\n### SECURITY AND COMPLIANCE\n\nadd here\n\n### ADDITIONAL NOTES\n\nadd here\n\n### CICD AND AUTOMATION\n\nadd here\n\n### DONE\n\n- [X] I Confirm"
-        IFS=$'\n\n' read -ra items <<< "$issue_body"
+        IFS=$'###' read -ra items <<< "$issue_body"
         echo "Items : $items"
         for i in "${!items[@]}"; do
           echo "item_$i=${items[i]}" >> $GITHUB_ENV
