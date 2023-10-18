@@ -16,15 +16,51 @@ jobs:
       name: review
       url: "${{ github.event.issue.html_url  }}"
     steps:
+      - name: Label Issue
+        id: label-issue
+        env:
+          HOOK_ID: ${{ vars.HOOK_ID }}
+          issue-url: ${{ github.event.issue.html_url  }}
+          TOKEN: ${{ secrets.MY_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          echo "Labeling issue with ${{ github.run_id }} ....."
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/labels" \
+            -d '{ "labels":["${{ github.run_id }}"]}'
+      - name: Comment on Issue
+        id: comment-issue
+        env:
+          HOOK_ID: ${{ vars.HOOK_ID }}
+          issue-url: ${{ github.event.issue.html_url  }}
+          TOKEN: ${{ secrets.MY_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_BODY: "Thank you for opening this issue! \n We are working on your request for Repo Creation"
+        run: |
+          echo "Commenting on the issue as $COMMENT_BODY....."
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
+            -d '{ "body": "Thank you for opening this issue!\nWe are working on your request for Repo Creation"}'
       - name: Read Issue Template Properties
         id: extract-properties
         env:
           HOOK_ID: ${{ vars.HOOK_ID }}
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
-          echo "Run ID: ${{ github.run_id }}"
-          issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
+          IFS="###" read -ra sections <<< "$issue_body"
+        
+          for section in "${sections[@]}"; do
+            if [ -n "$section" ]; then
+              echo "Section: $section"
+            fi
+          done
           property_names=("NAME_OF_REPOSITORY" "PURPOSE_OF_REPOSITORY" "TEAM_OR_INDIVIDUAL_REQUSTIN" "PRIMARY_CONTACT" "REPOSITORY_DESCRIPTION" "ACCESS_AND_PERMISSION" "ACCESS_CONTROL" "BRANCHING_STRATEGY" "COLLABORATORS" "SECURITY_AND_COMPLIANCE" "ADDITIONAL_NOTES")
           TOKEN="${{ secrets.MY_PAT }}"    
           declare -A property_values
@@ -60,41 +96,15 @@ jobs:
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           #TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
-          echo $NAME_OF_REPOSITORY
-          echo $TEAM_OR_INDIVIDUAL_REQUSTIN
-          echo $REPOSITORY_DESCRIPTION
-          echo "{test}={testing}" >> $GITHUB_OUTPUT
-          #echo "issue-numbe=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
-          #echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
-          #echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
-          #echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
-          COMMENT_BODY="Thank you for opening this issue! \n \
-                      We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
+          COMMENT_BODY="Thank you for your patience! \n \
+                      We are processing your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
             -d '{
               "body": "'"$COMMENT_BODY"'"
-            }'
-      - name: Label Issue
-        id: label-issue
-        env:
-          HOOK_ID: ${{ vars.HOOK_ID }}
-          issue-url: ${{ github.event.issue.html_url  }}
-        run: |
-          echo "Run ID: ${{ github.run_id }}"
-          TOKEN="${{ secrets.MY_PAT }}"    
-          REPO_NAME="${{ github.repository }}"
-          ISSUE_NUMBER="${{ github.event.issue.number }}"
-          curl -X POST \
-            -u "$TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/labels" \
-            -d '{
-            
-               "labels":["${{ github.run_id }}"]
             }'
   approve_repo_request:
     needs: [review_repo_request]

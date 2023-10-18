@@ -1,4 +1,4 @@
-name: Test REPO TEMPLATE
+name: Test Repository Request
 description: "Request the creation of a new repository"
 title: "Enter Tilte here"
 #lables:  ["Repo Request"]
@@ -13,15 +13,27 @@ body:
 - type: markdown
   attributes:
     value: "## Kelloggcompany Repository Request!!!"
-
-
-
     
+- type: markdown
+  attributes:
+    value: "Required fields are marked with an asterisk (*)."
+    
+- type: dropdown
+  attributes:
+    label: Template
+    description: What Template you want to use. 
+    options:
+        - Kellogg Basic 
+        - Kellogg Advance
+        - Kellogg Team Template 
+    default: 0
+  validations:
+      required: true
 - type: textarea
   attributes:
     label: NAME OF REPOSITORY
     description: Provide a clear and concise name for the repository
-    value: Sample Data
+    value: add here
   validations:
     required: true
 
@@ -29,86 +41,111 @@ body:
   attributes:
     label: PURPOSE OF REPOSITORY
     description: Explain the purpose and goals of this repository
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: textarea
   attributes:
-    label: TEAM OR INDIVIDUAL REQUSTIN
+    label: TEAM OR INDIVIDUAL REQUEST
     description: Name of the requesting team or individual
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: textarea
   attributes:
     label: PRIMARY CONTACT
     description: Provide the primary contact person's name and contact information
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: textarea
   attributes:
     label: REPOSITORY DESCRIPTION
     description: Provide a detailed description of the repository, including its intended use, project objectives, and any relevant context. Be as specific as possible.
+    value: add here
   validations:
-    required: true
-
-- type: checkboxes
-  attributes:
-    label: ACCESS AND PERMISSION
-    description: Select one of the options above for the repository's access level.
-    options:
-    - label: Public Repository (Anyone can access)
-    - label: Private Repository (Restricted access)
       required: true
 
+- type: dropdown
+  attributes:
+    label: ACCESS AND PERMISSION
+    description: Select one of the options above for the repository's access level. 
+    options:
+        - Public Repository (Anyone can access) 
+        - Internal Repository (Kellogg Users can access)
+        - Private Repository (Restricted access)
+          
+    default: 0
+  validations:
+      required: true
+
+
+- type: dropdown
+  attributes:
+    label: Add a README file
+    description: This is where you can write a long description for your project.
+    options:
+        - "Yes"
+        - "No"
+    default: 0
+  validations:
+      required: true
 - type: textarea
   attributes:
     label: ACCESS CONTROL
     description: Specify who should have access to the repository, including team members, collaborators, or specific individuals.
+    value: add here
   validations:
-    required: true
-
-- type: checkboxes
-  attributes:
-    label: BRANCHING STRATEGY
-    description: Choose the branching strategy for the repository or specify if it follows a custom strategy.
-    options:
-    - label: Single Branch (e.g., main, master)
-    - label: Feature Branching
-    - label: Gitflow (feature, develop, release, hotfix
-    - label: Other (Please specify)
       required: true
 
-- type: checkboxes
+- type: textarea
+  attributes:
+    label: BRANCHING STRATEGY
+    description: Choose any one branching strategy for the repository or specify if it follows a custom strategy.
+    placeholder: |
+      1. Single Branch (e.g., main, master)
+      2. Feature Branching
+      3. Gitflow (feature, develop, release, hotfix)
+      4. Other (Please specify)
+
+- type: dropdown
   attributes:
     label: COLLABORATORS
     description: Choose whether you require approval for adding collaborators to the repository.
     options:
-    - label: Require approval for adding collaborators
-    - label: Allow team members to add collaborators without approval
+        - Require approval for adding collaborators
+        - Allow team members to add collaborators without approval
+    default: 0
+  validations:
       required: true
+
 
 - type: textarea
   attributes:
     label: SECURITY AND COMPLIANCE
     description: Outline any security, compliance, or regulatory requirements that need to be addressed in this repository.
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: textarea
   attributes:
     label: ADDITIONAL NOTES
     description: Include any additional information, notes, or special instructions related to this repository request.
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: textarea
   attributes:
     label: CICD AND AUTOMATION
     description: Describe any continuous integration and continuous deployment CICD pipelines, automation scripts, or configuration needed for this repository.
+    value: add here
   validations:
-    required: true
+      required: true
 
 - type: checkboxes
   attributes:
@@ -117,4 +154,6 @@ body:
     options:
     - label: I Confirm
       required: true
+
+
 
