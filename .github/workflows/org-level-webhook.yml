@@ -22,10 +22,9 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo "Labeling issue with ${{ github.run_id }} ....."
-          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files")
-          echo $SCA_API_RESPONSE
+          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/pulls/281/files")        
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
-          echo "TTT: $SCAs"
+          
           for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
               _jq() {
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
@@ -33,6 +32,7 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"
               FILE_NAME=$(_jq '.filename')
               FILE_STATUS=$(_jq '.status')
-              echo "NAME: $FILE_NAME \n STATUS: $FILE_STATUS"
+              echo "NAME: $FILE_NAME"
+              echo "STATUS: $FILE_STATUS"
           done
           echo "ORG LEVEL WEBHOOK trigger"
