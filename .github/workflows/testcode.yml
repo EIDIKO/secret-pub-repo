@@ -19,7 +19,7 @@ jobs:
         for section in "${sections[@]}"; do
           if [ -n "$section" ]; then
             echo "Section: $section"
-            dynamic_text=$(echo "$section" | grep -oP '(?<=\n\n).*(?=\n\n)')
-            echo "extracted_data: $dynamic_text"
+            y=(${section//$'\n'/ })
+            echo "extracted_data: $y"
           fi
         done
