@@ -25,7 +25,7 @@ jobs:
           echo "Run ID: ${{ github.run_id }}"
           issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
-          echo "$issue_body" > file.txt
+          echo "${{ github.event.issue.body }}" > file.txt
           data=$(awk '/###/{flag=1; next} /###/{flag=0} flag' file.txt)
           IFS=$'\n' read -rd '' -a lines <<< "$data"
           for ((i=0; i<${#lines[@]}; i++)); do
