@@ -57,7 +57,7 @@ jobs:
           issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
           echo ${{ toJSON(github) }}
-          echo ${{ toJSON(${{ github.event.issue}})}}
+          echo ${{ toJSON(github.event.issue)}}
           echo "${{ github.event.issue.body }}" >> file.txt
           echo "2"
           data=$(awk '/###/{flag=1; next} /###/{flag=0} flag' file.txt)
