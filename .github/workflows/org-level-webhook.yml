@@ -1,4 +1,4 @@
-name: "Org Level Workflow"
+name: "Org Level Workflow(secret-pub-repo)"
 on:
   push:
     branches: [ "main" ]
