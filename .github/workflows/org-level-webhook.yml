@@ -22,15 +22,11 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo "Labeling issue with ${{ github.run_id }} ....."
-          curl -X POST \
-            -u "$TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files" > response.json
-          cat response.json
-          filename=$(jq -r '.[0].filename' response.json)   
+          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files")
+          SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
           echo "files ${{ github.event.pull_request.changed_files }}"
           echo "${{ toJson(github.event.pull_request) }}"
-          for file in ${{ github.event.pull_request.changed_files }}; do
+          for file in SCAs; do
             echo "file $file"
           done
           echo "ORG LEVEL WEBHOOK trigger"
