@@ -1,6 +1,9 @@
 name: Code Testing
 on:
-  workflow_dispatch
+  pull_request:
+    types:
+      - opened
+  workflow_dispatch:
 jobs:
   first_job:
     runs-on: ubuntu-latest
@@ -13,6 +16,7 @@ jobs:
     - name: Test Inline 
       id: first_job_step2
       run: |
+        echo "files ${{ github.event.pull_request.changed_files }}"
         issue_body="### Is there an existing issue for this?\n\n- [X] I have searched the existing issues, No issue created.\n\n### Template\n\nKellogg Basic\n\n### NAME OF REPOSITORY\n\nadd here\n\n### PURPOSE OF REPOSITORY\n\nadd here\n\n### TEAM OR INDIVIDUAL REQUEST\n\nadd here\n\n### PRIMARY CONTACT\n\nadd here\n\n### REPOSITORY DESCRIPTION\n\nadd here\n\n### ACCESS AND PERMISSION\n\nPublic Repository (Anyone can access)\n\n### Add a README file\n\nYes\n\n### ACCESS CONTROL\n\nadd here\n\n### BRANCHING STRATEGY\n\n_No response_\n\n### COLLABORATORS\n\nRequire approval for adding collaborators\n\n### SECURITY AND COMPLIANCE\n\nadd here\n\n### ADDITIONAL NOTES\n\nadd here\n\n### CICD AND AUTOMATION\n\nadd here\n\n### DONE\n\n- [X] I Confirm"
         IFS="###" read -ra sections <<< "$issue_body"
         
