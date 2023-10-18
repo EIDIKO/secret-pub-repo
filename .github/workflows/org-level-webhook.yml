@@ -21,9 +21,10 @@ jobs:
           REPO_NAME: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           P_NUMBER: ${{ github.event.pull_request.number }}
+          TT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Labeling issue with $P_NUMBER ....."
-          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/files")        
+          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TT" "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/files")        
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
           
           for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
