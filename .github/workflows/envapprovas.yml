@@ -30,9 +30,23 @@ jobs:
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/labels" \
+            -d '{ "labels":["${{ github.run_id }}"]}'
+      - name: Comment on Issue
+        id: comment-issue
+        env:
+          HOOK_ID: ${{ vars.HOOK_ID }}
+          issue-url: ${{ github.event.issue.html_url  }}
+          TOKEN: ${{ secrets.MY_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_BODY="Thank you for opening this issue! \n We are working on your request for Repo Creation"
+        run: |
+          curl -X POST \
+            -u "$TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_NAME/issues/$ISSUE_NUMBER/comments" \
             -d '{
-            
-               "labels":["${{ github.run_id }}"]
+              "body": "'"$COMMENT_BODY"'"
             }'
       - name: Read Issue Template Properties
         id: extract-properties
@@ -91,17 +105,9 @@ jobs:
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           #TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
-          echo $NAME_OF_REPOSITORY
-          echo $TEAM_OR_INDIVIDUAL_REQUSTIN
-          echo $REPOSITORY_DESCRIPTION
-          echo "{test}={testing}" >> $GITHUB_OUTPUT
-          #echo "issue-numbe=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
-          #echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
-          #echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
-          #echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
-          COMMENT_BODY="Thank you for opening this issue! \n \
-                      We are working on your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
+          COMMENT_BODY="Thank you for your patience! \n \
+                      We are processing your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
@@ -109,7 +115,6 @@ jobs:
             -d '{
               "body": "'"$COMMENT_BODY"'"
             }'
-
   approve_repo_request:
     needs: [review_repo_request]
     runs-on: ubuntu-latest
