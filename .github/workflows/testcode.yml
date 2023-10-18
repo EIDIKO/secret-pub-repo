@@ -19,7 +19,7 @@ jobs:
         for section in "${sections[@]}"; do
           if [ -n "$section" ]; then
             echo "Section: $section"
-            extracted_data=$(echo "$section" | sed -n 's/.*\n\n\(.*\)\n\n.*/\1/p')
-            echo "extracted_data: $extracted_data"
+             modified_data=$(echo "$data" | sed 's/\n\n/ /g')
+             echo "extracted_data: $extracted_data"
           fi
         done
