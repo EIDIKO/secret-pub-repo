@@ -31,7 +31,8 @@ jobs:
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
               }
               echo "++++++++++++++++++++++++++++++++++"
-              SAC_ALERT=$(_jq '.filename')
-              echo $SAC_ALERT
+              FILE_NAME=$(_jq '.filename')
+              FILE_STATUS=$(_jq '.status')
+              echo "NAME: $FILE_NAME \n STATUS: $FILE_STATUS"
           done
           echo "ORG LEVEL WEBHOOK trigger"
