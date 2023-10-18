@@ -26,6 +26,7 @@ jobs:
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/$REPO_NAME//pulls/281/files > response.json
+          cat response.json
           filename=$(jq -r '.[0].filename' response.json)   
           echo "files ${{ github.event.pull_request.changed_files }}"
           echo "${{ toJson(github.event.pull_request) }}"
