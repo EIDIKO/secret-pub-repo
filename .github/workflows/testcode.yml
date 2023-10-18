@@ -17,7 +17,7 @@ jobs:
         IFS="###" read -ra sections <<< "$issue_body"
         
         for section in "${sections[@]}"; do
-          
-          echo "Section: $section"
-        
+          if [ -n "$section" ]; then
+            echo "Section: $section"
+          fi
         done
