@@ -25,7 +25,7 @@ jobs:
           echo "Run ID: ${{ github.run_id }}"
           issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
-          echo $issue_body
+          echo "IssueBody $issue_body"
           property_names=("NAME_OF_REPOSITORY" "PURPOSE_OF_REPOSITORY" "TEAM_OR_INDIVIDUAL_REQUSTIN" "PRIMARY_CONTACT" "REPOSITORY_DESCRIPTION" "ACCESS_AND_PERMISSION" "ACCESS_CONTROL" "BRANCHING_STRATEGY" "COLLABORATORS" "SECURITY_AND_COMPLIANCE" "ADDITIONAL_NOTES")
           TOKEN="${{ secrets.MY_PAT }}"    
           declare -A property_values
