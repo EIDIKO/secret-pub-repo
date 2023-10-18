@@ -19,7 +19,7 @@ jobs:
         for section in "${sections[@]}"; do
           if [ -n "$section" ]; then
             echo "Section: $section"
-            modified_data=$(echo "$section" | sed -E 's/[^*]+ \n\n/ REPLACEMENT_STRING /g')
-            echo "extracted_data: $modified_data"
+            dynamic_text=$(echo "$section" | grep -oP '(?<=\n\n).*(?=\n\n)')
+            echo "extracted_data: $dynamic_text"
           fi
         done
