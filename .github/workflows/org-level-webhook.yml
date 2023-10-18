@@ -23,9 +23,8 @@ jobs:
         run: |
           echo "Labeling issue with ${{ github.run_id }} ....."
           SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files")
+          echo $SCA_API_RESPONSE
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
-          #echo "files ${{ github.event.pull_request.changed_files }}"
-          #echo "${{ toJson(github.event.pull_request) }}"
           echo "TTT: $SCAs"
           for file in SCAs; do
             echo "file $file"
