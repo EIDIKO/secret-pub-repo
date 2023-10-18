@@ -25,8 +25,7 @@ jobs:
           REPO_NAME: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          echo "Labeling issue....."
-          echo "Run ID: ${{ github.run_id }}"
+          echo "Labeling issue with ${{ github.run_id }} ....."
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
@@ -42,7 +41,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           COMMENT_BODY: "Thank you for opening this issue! \n We are working on your request for Repo Creation"
         run: |
-          echo "Commenting on the issue....."
+          echo "Commenting on the issue as $COMMENT_BODY....."
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
