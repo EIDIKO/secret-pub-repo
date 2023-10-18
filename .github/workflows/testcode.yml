@@ -17,4 +17,11 @@ jobs:
         IFS=$'\n\n' read -ra items <<< "$issue_body"
         for i in "${!items[@]}"; do
           echo "item_$i=${items[i]}" >> $GITHUB_ENV
+          echo "1"
+          echo $items_$i
+          echo "2"
+          echo items[i]
+          echo "3"
+          echo $items[i]
+          echo "4"
         done
