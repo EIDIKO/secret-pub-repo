@@ -25,9 +25,13 @@ jobs:
           echo "Run ID: ${{ github.run_id }}"
           issue_boddy="test"
           issue_body="${{ github.event.issue.body }}"
+          echo "1"
           echo "${{ github.event.issue.body }}" >> file.txt
+          echo "2"
           data=$(awk '/###/{flag=1; next} /###/{flag=0} flag' file.txt)
+          echo "3"
           IFS=$'\n' read -rd '' -a lines <<< "$data"
+          echo "4"
           for ((i=0; i<${#lines[@]}; i++)); do
             line="line_${i}"
             echo "::set-output name=$line::${lines[i]}"
