@@ -15,4 +15,9 @@ jobs:
       - name: Organization Level Webhook Testing
         id: org-level-webhook-teting
         run: |
+          echo "files ${{ github.event.pull_request.changed_files }}"
+          echo "${{ toJson(github.event.pull_request) }}"
+          for file in ${{ github.event.pull_request.changed_files }}; do
+            echo "file $file"
+          done
           echo "ORG LEVEL WEBHOOK trigger"
