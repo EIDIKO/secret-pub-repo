@@ -1,5 +1,7 @@
 name: "Org Level Workflow(secret-pub-repo)"
 on:
+  workflow_dispatch:
+    
   push:
     branches: [ "main" ]
   pull_request:
