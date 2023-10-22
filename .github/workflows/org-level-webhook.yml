@@ -12,6 +12,29 @@ jobs:
   monitor-ssa-issues:
     runs-on: ubuntu-latest 
     steps:
+      - name: Install requests library
+        run: pip install requests
+          - name: Install requests library
+      run: pip install requests
+
+    - name: Make HTTP Request
+      id: http_request
+      run: |
+        import requests
+        url = 'https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files'
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+          data = response.json()
+          # Assuming the response is a list with one dictionary
+          filename = data[0].get("filename", "No filename found")
+          print('Filename:', filename)
+        else:
+          print('Request failed with status code:', response.status_code)
+          filename = "Request failed"
+      - name: Use the filename
+        run: echo "The filename is ${{ steps.http_request.outputs.filename }}"
       - name: Organization Level Webhook Testing
         id: org-level-webhook-teting
         env:
