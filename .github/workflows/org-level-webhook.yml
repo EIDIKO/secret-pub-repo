@@ -36,5 +36,7 @@ jobs:
               FILE_STATUS=$(_jq '.status')
               echo "NAME: $FILE_NAME"
               echo "STATUS: $FILE_STATUS"
+              FILE_BASENAME=$(basename "$FILE_NAME")
+              FILENAME="${FILE_BASENAME%.*}"
           done
           echo "ORG LEVEL WEBHOOK trigger"
