@@ -1,0 +1,18 @@
+name: triggered-workflow
+on:
+  workflow_dispatch:
+    inputs:
+      FILENAME:
+        description: 'This is input filename'
+        default: 'testfile'
+        required: true
+       
+
+jobs:
+  custom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Triggering Workflow for Issue Creation
+        run: |
+          echo "Custom parameter value: ${{ github.event.inputs.FILENAME}}"
+          echo "Custom parameter value: ${{ github.event.FILENAME}}"
