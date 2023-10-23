@@ -20,9 +20,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           P_NUMBER: ${{ github.event.pull_request.number }}
           TT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-        shell: python
-        
+        shell: python        
         run: |
           import base64
           import json
