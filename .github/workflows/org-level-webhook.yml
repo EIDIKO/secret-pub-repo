@@ -12,6 +12,10 @@ jobs:
   monitor-ssa-issues:
     runs-on: ubuntu-latest 
     steps:
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
       - name: Python Testing
         id: python-teting
         env:
