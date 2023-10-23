@@ -46,33 +46,22 @@ jobs:
             filename = data[0].get("filename", "No filename found")
             print('Filename:', filename)
             filename_without_extension = filename.split("/")[-1].split(".")[0]
+            print(f"::set-output name=filename::{filename_without_extension}")
             print('filename_without_extension:', filename_without_extension)
           else:
             print('Request failed with status code:', response.status_code)
             filename = "Request failed"        
-      - name: Organization Level Webhook Testing
-        id: org-level-webhook-teting
+      - name: Trigger Another Workflow
         env:
-          HOOK_ID: ${{ vars.HOOK_ID }}
-          issue-url: ${{ github.event.issue.html_url  }}
           TOKEN: ${{ secrets.MY_PAT }}   
           REPO_NAME: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           P_NUMBER: ${{ github.event.pull_request.number }}
           TT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Labeling issue with $P_NUMBER ....."
-          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TT" "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/files")        
-          SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
-          
-          for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
-              _jq() {
-                echo "${SCA}" | base64 --decode | jq -r "${1}"
-              }
-              echo "++++++++++++++++++++++++++++++++++"
-              FILE_NAME=$(_jq '.filename')
-              FILE_STATUS=$(_jq '.status')
-              echo "NAME: $FILE_NAME"
-              echo "STATUS: $FILE_STATUS"
-          done
-          echo "ORG LEVEL WEBHOOK trigger"
+          echo "FILENAME: ${{ steps.python-teting.outputs.filename }}"
+          curl -X POST \
+            -H "Authorization: token ${{ TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/triggered-workflow/dispatches \
+            -d '{"ref":"main", "inputs": {"FILENAME": "${{ steps.python-teting.outputs.filename }}"}}'
