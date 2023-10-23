@@ -1,7 +1,7 @@
 name: "Org Level Workflow(secret-pub-repo)"
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
