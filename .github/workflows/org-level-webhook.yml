@@ -1,9 +1,7 @@
 name: "Org Level Workflow(secret-pub-repo)"
 on:
-  workflow_dispatch:
-    
   push:
-    branches: [ "*" ]
+    branches: [ "main" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -14,29 +12,29 @@ jobs:
   monitor-ssa-issues:
     runs-on: ubuntu-latest 
     steps:
-      - name: Install requests library
-        run: pip install requests
-          - name: Install requests library
-      run: pip install requests
-
-    - name: Make HTTP Request
-      id: http_request
-      run: |
-        import requests
-        url = 'https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/281/files'
-
-        response = requests.get(url)
-
-        if response.status_code == 200:
-          data = response.json()
-          # Assuming the response is a list with one dictionary
-          filename = data[0].get("filename", "No filename found")
-          print('Filename:', filename)
-        else:
-          print('Request failed with status code:', response.status_code)
-          filename = "Request failed"
-      - name: Use the filename
-        run: echo "The filename is ${{ steps.http_request.outputs.filename }}"
+      - name: Python Testing
+        id: python-teting
+        env:
+          TOKEN: ${{ secrets.MY_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          P_NUMBER: ${{ github.event.pull_request.number }}
+          TT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+        shell: python
+        
+        run: |
+          import base64
+          import json
+          import os
+          import requests
+          REPO_NAME = os.environ["REPO_NAME"]
+          P_NUMBER = os.environ["P_NUMBER"]
+          TOKEN = os.environ["TOKEN"]
+          print("Value of REPO_NAME: " + REPO_NAME)
+          print("Value of P_NUMBER: " + P_NUMBER)
+          print("Value of TOKEN: " + TOKEN)
+        
       - name: Organization Level Webhook Testing
         id: org-level-webhook-teting
         env:
@@ -61,7 +59,5 @@ jobs:
               FILE_STATUS=$(_jq '.status')
               echo "NAME: $FILE_NAME"
               echo "STATUS: $FILE_STATUS"
-              FILE_BASENAME=$(basename "$FILE_NAME")
-              FILENAME="${FILE_BASENAME%.*}"
           done
           echo "ORG LEVEL WEBHOOK trigger"
