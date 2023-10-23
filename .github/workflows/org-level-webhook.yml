@@ -12,6 +12,29 @@ jobs:
   monitor-ssa-issues:
     runs-on: ubuntu-latest 
     steps:
+      - name: Python Testing
+        id: python-teting
+        env:
+          TOKEN: ${{ secrets.MY_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          P_NUMBER: ${{ github.event.pull_request.number }}
+          TT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+        shell: python
+        
+        run: |
+          import base64
+          import json
+          import os
+          import requests
+          REPO_NAME = os.environ["REPO_NAME"]
+          P_NUMBER = os.environ["P_NUMBER"]
+          TOKEN = os.environ["TOKEN"]
+          print("Value of REPO_NAME: " + REPO_NAME)
+          print("Value of P_NUMBER: " + P_NUMBER)
+          print("Value of TOKEN: " + TOKEN)
+        
       - name: Organization Level Webhook Testing
         id: org-level-webhook-teting
         env:
