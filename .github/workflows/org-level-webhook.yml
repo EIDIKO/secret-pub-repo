@@ -49,7 +49,8 @@ jobs:
             print(f"::set-output name=filename::{filename_without_extension}")
             print('filename_without_extension:', filename_without_extension)
             output = 'filename'
-            print(f'Output: ${{{{ steps.set_output.outputs.{output} }}}}')          else:
+            print(f'Output: ${{{{ steps.set_output.outputs.{output} }}}}')          
+          else:
             print('Request failed with status code:', response.status_code)
             filename = "Request failed"        
       - name: Trigger Another Workflow
