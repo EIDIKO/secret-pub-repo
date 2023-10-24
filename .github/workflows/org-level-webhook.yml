@@ -58,6 +58,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.MY_PAT }}   
         run: |
+          #echo "basefile=$BASEFILE" >> $GITHUB_OUTPUT
           echo "FILENAME: ${{ steps.python-teting.outputs.filename }}"
           echo "FILENAME: ${{ steps.python-teting.outputs.basefilename }}"
           echo "FILENAME: ${{ steps.python-teting.outputs.basefilenameq }}"
