@@ -48,7 +48,7 @@ jobs:
             filename_without_extension = filename.split("/")[-1].split(".")[0]
             print(f"::set-output name=filename::{filename_without_extension}")
             print('filename_without_extension:', filename_without_extension)
-            print(f"::set-output name=basefilenameq::{filename_without_extension}")
+            print(f"::set-output name=basefilenameq::"+filename_without_extension)
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: 
                   fh.write(f"basefilename={filename_without_extension}")
           else:
