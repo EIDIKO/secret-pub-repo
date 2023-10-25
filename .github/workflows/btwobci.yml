@@ -39,8 +39,8 @@ jobs:
           print("Value of P_NUMBER: " + P_NUMBER)
           print("Value of TOKEN: " + TOKEN)
           #url = 'https://api.github.com/repos/{}/pulls/{}/files.format(REPO_NAME, P_NUMBER)
-          url- "https://api.github.com/repos/"+REPO_NAME+"/pulls/"+P_NUMBER+"/files"
-          echo "URL: $url"
+          url= "https://api.github.com/repos/"+REPO_NAME+"/pulls/"+P_NUMBER+"/files"
+          print("Formated URL" + url)
           response = requests.get(url)
           if response.status_code == 200:
             data = response.json()
