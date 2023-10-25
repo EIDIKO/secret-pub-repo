@@ -43,17 +43,19 @@ jobs:
           response = requests.get(url)
           if response.status_code == 200:
             data = response.json()
-            filename = data[0].get("filename", "No filename found")
-            if filename.startswith("maps/"):
-              print("The file name contains 'maps/'.")
-            else:
-              print("The file name does not contain 'maps/'.")
-            print('Filename:', filename)
-            filename_without_extension = filename.split("/")[-1].split(".")[0]
-            print('filename_without_extension:', filename_without_extension)
-            #print(f"::set-output name=basefile::"+filename_without_extension)
-            with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: 
-                  fh.write(f"basefile={filename_without_extension}")
+            for item in data:
+              filename = item["filename"]
+              #filename = data[0].get("filename", "No filename found")
+              if filename.startswith("maps/"):
+                print("The file name contains 'maps/'.")
+              else:
+                print("The file name does not contain 'maps/'.")
+              print('Filename:', filename)
+              filename_without_extension = filename.split("/")[-1].split(".")[0]
+              print('filename_without_extension:', filename_without_extension)
+              #print(f"::set-output name=basefile::"+filename_without_extension)
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: 
+                    fh.write(f"basefile={filename_without_extension}")
           else:
             print('Request failed with status code:', response.status_code)
             filename = "Request failed"
