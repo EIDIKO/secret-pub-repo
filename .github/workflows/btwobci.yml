@@ -1,0 +1,92 @@
+name: BCI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+permissions: read-all
+jobs:
+  MapTest-Identify:
+    runs-on: ubuntu-latest
+    outputs:
+      basefile: ${{ steps.getprfilename.outputs.basefile }}
+    steps:
+      - name: Get PR File Name
+        id: getprfilename
+        env:
+          REPO_NAME: ${{ github.repository }}
+          P_NUMBER: ${{ github.event.pull_request.number }}
+          TOKEN: ${{ secrets.PAT_TOKEN }}
+        shell: python
+        run: |
+          import base64
+          import json
+          import os
+          import requests
+          REPO_NAME = os.environ["REPO_NAME"]
+          P_NUMBER = os.environ["P_NUMBER"]
+          TOKEN = os.getenv("TOKEN")
+          
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer {}".format(TOKEN),
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+          response = requests.get(             "https://api.github.com/repos/{}/pulls/{}/files".format(REPO_NAME, P_NUMBER),
+              headers=headers,
+          )              
+          data = response.json()
+          for sca in data:
+              filename = sca['filename']
+              status = sca['status']
+              print('++++++++++++++++++++++++++++++++++')
+              print('NAME: {}'.format(filename))
+              print('STATUS: {}'.format(status))
+              file_basename = os.path.basename(filename)
+              filename_without_ext = os.path.splitext(file_basename)[0]
+              print('printing filename without ext')
+              print(filename_without_ext)
+              print(f"::set-output name=basefile::"+filename_without_ext)
+      - name: Copy File
+        id: copyfiles
+        env:
+          BASEFILE: "KLG_B2BI_GITHUB_TASKS_WORKSHOP"
+        run: |
+          echo "BASEFILE-Static: $BASEFILE"
+          echo "BASEFILE-Needs: ${{ needs.MapTest-Identify.outputs.basefile }}"
+          echo "BASEFILE-steps: ${{ steps.getprfilename.outputs.basefile }}"
+          echo "basefile=$BASEFILE" >> $GITHUB_OUTPUT
+  MapTest-Create:
+    needs: [MapTest-Identify]
+    runs-on: self-hosted
+    steps:
+      - name: CreateInitparms
+        run: |
+          echo ${{ needs.MapTest-Identify.outputs.basefile }}
+          ssh uskm1u04@usaws3601.us.kellogg.com 'echo "<mapname>${{needs.MapTest-Identify.outputs.basefile}}</mapname>" > /home/uskm1u04/maptest/initparms'
+          
+      # Copy map into APP server
+      - name: Copy Map from Repo to App Server
+        run: |
+          echo ${{ needs.MapTest-Identify.outputs.basefile }}
+          echo $GITHUB_WORKSPACE
+          scp $GITHUB_WORKSPACE/maps/${{needs.MapTest-Identify.outputs.basefile}}* uskm1u04@usaws3601.us.kellogg.com:/home/uskm1u04/maps
+          #ssh uskm1u04@usaws3601.us.kellogg.com 'cp $GITHUB_WORKSPACE/maps/${{needs.MapTest-Identify.outputs.basefile}}/* /home/uskm1u04/maps
+      # Manual Validation for test
+      # when component.diffs file is zero bytes, test is good
+      # When difference file size is bigger than 0, trigger a manual valudation
+      - name: Manual Validation for test
+        run: |
+          # Get the size of the file
+          file_size=$(ssh uskm1u04@usaws3601.us.kellogg.com 'stat -c "%s" /home/uskm1u04/maptest/diffs/${{needs.MapTest-Identify.outputs.basefile}}.diffs')
+          # Check if the file size is zero
+          if [[ "$file_size" -eq 0 ]]; then
+            # The file is zero bytes
+            echo "The file is zero bytes."
+            exit 0
+          else
+            # The file is not zero bytes
+            echo "The file is not zero bytes."
+            echo "There are differences on Github components, check ${{needs.MapTest-Identify.outputs.basefile}}.diffs" | mail -s "this is the subject" "mario.urbina@kellanova.com"
+          fi
