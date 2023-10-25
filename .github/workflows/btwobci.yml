@@ -12,7 +12,7 @@ jobs:
     outputs:
       basefile: ${{ steps.getprfilename.outputs.basefile }}
     steps:
-      - name: Set up Python 2.8
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
@@ -38,13 +38,11 @@ jobs:
           print("Value of REPO_NAME: " + REPO_NAME)
           print("Value of P_NUMBER: " + P_NUMBER)
           print("Value of TOKEN: " + TOKEN)
-          #url = 'https://api.github.com/repos/{}/pulls/{}/files.format(REPO_NAME, P_NUMBER)
           url= "https://api.github.com/repos/"+REPO_NAME+"/pulls/"+P_NUMBER+"/files"
           print("Formated URL" + url)
           response = requests.get(url)
           if response.status_code == 200:
             data = response.json()
-            # Assuming the response is a list with one dictionary
             filename = data[0].get("filename", "No filename found")
             print('Filename:', filename)
             filename_without_extension = filename.split("/")[-1].split(".")[0]
@@ -94,5 +92,5 @@ jobs:
           else
             # The file is not zero bytes
             echo "The file is not zero bytes."
-            echo "There are differences on Github components, check ${{needs.MapTest-Identify.outputs.basefile}}.diffs" | mail -s "this is the subject" "mario.urbina@kellanova.com"
+            echo "There are differences on Github components, check ${{needs.MapTest-Identify.outputs.basefile}}.diffs" | mail -s "B2Bi Test Result Mismatch" "mario.urbina@kellanova.com"
           fi
