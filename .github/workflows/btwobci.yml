@@ -18,8 +18,8 @@ jobs:
           python-version: 3.8
       - name: Install requests modules
         run: pip install requests
-      - name: Python Testing
-        id: python-teting
+      - name: Get PR File Name
+        id: getprfilename
         env:
           TOKEN: ${{ secrets.MY_PAT }}   
           REPO_NAME: ${{ github.repository }}
@@ -48,12 +48,21 @@ jobs:
             filename_without_extension = filename.split("/")[-1].split(".")[0]
             print(f"::set-output name=filename::{filename_without_extension}")
             print('filename_without_extension:', filename_without_extension)
-            print(f"::set-output name=basefilenameq::"+filename_without_extension)
+            print(f"::set-output name=basefile::"+filename_without_extension)
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: 
                   fh.write(f"basefilename={filename_without_extension}")
           else:
             print('Request failed with status code:', response.status_code)
-            filename = "Request failed" 
+            filename = "Request failed"
+      - name: Copy File
+        id: copyfiles
+        env:
+          BASEFILE: "KLG_B2BI_GITHUB_TASKS_WORKSHOP"
+        run: |
+          echo "BASEFILE-Static: $BASEFILE"
+          echo "BASEFILE-Needs: ${{ needs.MapTest-Identify.outputs.basefile }}"
+          echo "BASEFILE-steps: ${{ steps.getprfilename.outputs.basefile }}"
+          echo "basefile=$BASEFILE" >> $GITHUB_OUTPUT
   MapTest-Create:
     needs: [MapTest-Identify]
     runs-on: self-hosted
