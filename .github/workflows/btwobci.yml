@@ -38,7 +38,8 @@ jobs:
           print("Value of REPO_NAME: " + REPO_NAME)
           print("Value of P_NUMBER: " + P_NUMBER)
           print("Value of TOKEN: " + TOKEN)
-          url = 'https://api.github.com/repos/EIDIKO/secret-pub-repo/pulls/294/files'
+          url = 'https://api.github.com/repos/{}/pulls/{}/files.format(REPO_NAME, P_NUMBER)
+          echo "URL: $url"
           response = requests.get(url)
           if response.status_code == 200:
             data = response.json()
@@ -49,8 +50,6 @@ jobs:
             print(f"::set-output name=filename::{filename_without_extension}")
             print('filename_without_extension:', filename_without_extension)
             print(f"::set-output name=basefile::"+filename_without_extension)
-            with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: 
-                  fh.write(f"basefilename={filename_without_extension}")
           else:
             print('Request failed with status code:', response.status_code)
             filename = "Request failed"
@@ -59,15 +58,10 @@ jobs:
     needs: [MapTest-Identify]
     runs-on: ubuntu-latest
     steps:
-      - name: Copy File
+      - name: Check Modified File
         id: copyfiles
-        env:
-          BASEFILE: "KLG_B2BI_GITHUB_TASKS_WORKSHOP"
         run: |
-          echo "BASEFILE-Static: $BASEFILE"
           echo "BASEFILE-Needs: ${{ needs.MapTest-Identify.outputs.basefile }}"
-          echo "BASEFILE-steps: ${{ steps.getprfilename.outputs.basefile }}"
-          echo "basefile=$BASEFILE" >> $GITHUB_OUTPUT
   MapTest-Create:
     needs: [MapTest-Identify]
     runs-on: self-hosted
