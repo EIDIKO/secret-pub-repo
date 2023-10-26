@@ -103,9 +103,10 @@ jobs:
         run: |
           BRANCH_TO_DELETE="${{github.head_ref}}"
           echo $BRANCH_TO_DELETE
+          
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token $PULLTOKEN" \         
+            -H "Authorization: token $PULLTOKEN" \
             https://api.github.com/repos/$REPO_NAME/git/refs/heads/$BRANCH_TO_DELETE)
 
           echo "HTTP Status Code: $HTTP_STATUS"
