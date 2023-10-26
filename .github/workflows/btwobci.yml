@@ -78,7 +78,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/merge" \
             -d '{"commit_title":"Merging Pull Request into Main","commit_message":"Merging Pull Request into Main"}'
-      - name: Verify Merged Pull Request
+      - name: Verifying Merged Pull Request
         env:
           TOKEN: ${{ secrets.MY_PAT }}  
           PULLTOKEN: ${{ secrets.PULL_PAT }}   
