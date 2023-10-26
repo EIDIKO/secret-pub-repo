@@ -59,7 +59,7 @@ jobs:
             print('Request failed with status code:', response.status_code)
             filename = "Request failed"
 
-  MapTest-Merge:
+  MapTest-Merge-n-Delete:
     needs: [MapTest-Check]
     runs-on: ubuntu-latest
     steps:
