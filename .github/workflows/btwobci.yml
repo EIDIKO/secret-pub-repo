@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-permissions: read-all
+permissions: write-all
 jobs:
   MapTest-Identify:
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
           TT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -X POST \
-            -u "$TOKEN" \
+            -u "$TT" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/merge" \
             -d '{
@@ -79,7 +79,7 @@ jobs:
             }'
 
           # Verify the merge status
-          MERGE_STATUS=$(curl -s -H "Authorization: token $TOKEN" https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER | jq -r .merged)
+          MERGE_STATUS=$(curl -s -H "Authorization: token $TT" https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER | jq -r .merged)
 
           if [ "$MERGE_STATUS" = "true" ]; then
             echo "Pull Request merged successfully."
