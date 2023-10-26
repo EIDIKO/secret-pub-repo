@@ -61,6 +61,8 @@ jobs:
 
   MapTest-Merge-n-Delete:
     needs: [MapTest-Check]
+    environment: 
+      name: approve
     runs-on: ubuntu-latest
     steps:
       - name: Merge Pull Request
