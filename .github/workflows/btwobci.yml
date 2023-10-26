@@ -77,15 +77,45 @@ jobs:
             -u "$PULLTOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/merge" \
-            -d '{"commit_title":"Expand enum","commit_message":"Add a new value to the merge_method enum"}'
-
-          # Verify the merge status
+            -d '{"commit_title":"Merging Pull Request into Main","commit_message":"Merging Pull Request into Main"}'
+      - name: Verify Merged Pull Request
+        env:
+          TOKEN: ${{ secrets.MY_PAT }}  
+          PULLTOKEN: ${{ secrets.PULL_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          P_NUMBER: ${{ github.event.pull_request.number }}
+          TT: ${{ secrets.GITHUB_TOKEN }}
+        run: |  
           MERGE_STATUS=$(curl -s -H "Authorization: token $TT" https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER | jq -r .merged)
-
           if [ "$MERGE_STATUS" = "true" ]; then
             echo "Pull Request merged successfully."
           else
             echo "Failed to merge the Pull Request."
+            exit 1
+          fi
+      - name: Delete Branch
+        id: delete-branch
+        env: 
+          PULLTOKEN: ${{ secrets.PULL_PAT }}   
+          REPO_NAME: ${{ github.repository }}
+          P_NUMBER: ${{ github.event.pull_request.number }}
+          TT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_TO_DELETE="${{github.head_ref}}"
+          echo $BRANCH_TO_DELETE
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token $PULLTOKEN" \         
+            https://api.github.com/repos/$REPO_NAME/git/refs/heads/$BRANCH_TO_DELETE)
+
+          echo "HTTP Status Code: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" = "204" ]; then
+            echo "Branch deletion was successful."
+          elif [ "$HTTP_STATUS" = "404" ]; then
+            echo "Branch not found. It may have already been deleted."
+          else
+            echo "Failed to delete the branch."
             exit 1
           fi
   MapTest-Check:
