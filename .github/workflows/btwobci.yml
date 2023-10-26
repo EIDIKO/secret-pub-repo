@@ -65,7 +65,8 @@ jobs:
     steps:
       - name: Merge Pull Request
         env:
-          TOKEN: ${{ secrets.MY_PAT }}   
+          TOKEN: ${{ secrets.MY_PAT }}  
+          PULLTOKEN: ${{ secrets.PULL_PAT }}   
           REPO_NAME: ${{ github.repository }}
           P_NUMBER: ${{ github.event.pull_request.number }}
           TT: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +74,7 @@ jobs:
           echo $REPO_NAME
           echo $P_NUMBER
           curl -X PUT \
-            -u "$TOKEN" \
+            -u "$PULLTOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_NAME/pulls/$P_NUMBER/merge" \
             -d '{"commit_title":"Expand enum","commit_message":"Add a new value to the merge_method enum"}'
