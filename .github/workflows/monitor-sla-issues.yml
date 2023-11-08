@@ -12,17 +12,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
-
-    - name: Install dependencies
-      run: |
-        pip install xlsxwriter
-    - name: Checkout code
-      uses: actions/checkout@v2    
+    
     - name: Monitor SSAlert Issues
       id: monitor-ssa-issues
       env:
@@ -176,12 +166,3 @@ jobs:
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
-    - name: Create Excel Sheet
-      run: |
-        python create_excel.py
-
-    - name: Upload Excel Sheet
-      uses: actions/upload-artifact@v2
-      with:
-        name: excel-sheet
-        path: output.xlsx
