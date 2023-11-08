@@ -13,6 +13,7 @@ jobs:
       id: extract-delivery-create-issue
       env:
         HOOK_ID: ${{ vars.HOOK_ID }}
+        I_URL: "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249"
       run: |
         TOKEN="${{ secrets.MY_PAT }}"
         BASE_URL="https://api.github.com"
@@ -62,6 +63,13 @@ jobs:
           exit 0
         fi
 
+        ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
+        COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
+        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
+        ISSUE_COUNT=0
+        ISSUE_COUNT_3D_OLD=0
+        ISSUE_COUNT_7D_OLD=0
+
 
         echo "Page Value: $PAGE_VALUE"
 
@@ -84,7 +92,9 @@ jobs:
               }
               echo "++++++++++++++++++++++++++++++++++"
               SAC_ALERT=$(_jq '.html_url')
-  
+              let "ISSUE_COUNT+=1"
+              let "ISSUE_COUNT_7D_OLD+=1"
+              let "ISSUE_COUNT_3D_OLD+=1"
               
               CREATED_AT=$(_jq '.created_at')
               OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
@@ -131,13 +141,42 @@ jobs:
               echo $login_user            
               ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
               echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              ISSUE_URL =$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
+              ISSUE_NUMBER =$(echo $ISSUE_RESPONSE | jq -r '.number') 
+              REPO_URL =$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
+              ISSUE_TITLE =$(echo $ISSUE_RESPONSE | jq -r '.title') 
+              ASS_LOGIN =$(echo $ISSUE_RESPONSE | jq -r '.assignee.login') 
+              ASS_TYPE =$(echo $ISSUE_RESPONSE | jq -r '.assignee.type')
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL#$ISSUE_NUMBER}"
+              issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
+              issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
+              issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
+              issue_data="${issue_data//ASS_TYPE/$ASS_TYPE}"
+              COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
               echo "++++++++++++++++++++++++++++++++++"         
           done
           if [ "$BREAK_FLAG" == "BREAK" ]; then
             echo "Breaking External For loop"
             break
           fi
-        done          
+        done
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_COUNT_VAL/$ISSUE_COUNT}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//3DAYS_OLD_VAL/$ISSUE_COUNT_3D_OLD}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//7DAYS_OLD_VAL/$ISSUE_COUNT_7D_OLD}"
+        curl -X POST \
+              -u "$TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "$I_URL/comments" \
+               -d '{
+                    "body": "'"$COMMENT_BODY_ISSUES"'"
+                }'
+        curl -X POST \
+               -u "$TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "$I_URL/comments" \
+               -d '{
+                    "body": "'"$COMMENT_BODY_MD"'"
+                }'
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
