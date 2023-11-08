@@ -17,6 +17,7 @@ jobs:
       env:
         I_URL: "https://github.com/EIDIKO/secret-pub-repo/issues/249"
       run: |
+        echo "$I_URL"
         TOKEN="${{ secrets.MY_PAT }}"
         BASE_URL="https://api.github.com"
         API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/issues?per_page=100&page=1&state=open&direction=desc"
