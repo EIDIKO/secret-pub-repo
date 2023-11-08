@@ -141,12 +141,12 @@ jobs:
               echo $login_user            
               ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
               echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
-              ISSUE_URL =$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
-              ISSUE_NUMBER =$(echo $ISSUE_RESPONSE | jq -r '.number') 
-              REPO_URL =$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
-              ISSUE_TITLE =$(echo $ISSUE_RESPONSE | jq -r '.title') 
-              ASS_LOGIN =$(echo $ISSUE_RESPONSE | jq -r '.assignee.login') 
-              ASS_TYPE =$(echo $ISSUE_RESPONSE | jq -r '.assignee.type')
+              ISSUE_URL=$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
+              ISSUE_NUMBER=$(echo $ISSUE_RESPONSE | jq -r '.number') 
+              REPO_URL=$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
+              ISSUE_TITLE=$(echo $ISSUE_RESPONSE | jq -r '.title') 
+              ASS_LOGIN=$(echo $ISSUE_RESPONSE | jq -r '.assignee.login') 
+              ASS_TYPE=$(echo $ISSUE_RESPONSE | jq -r '.assignee.type')
               issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL#$ISSUE_NUMBER}"
               issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
               issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
