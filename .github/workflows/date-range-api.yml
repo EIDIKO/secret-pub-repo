@@ -77,7 +77,7 @@ jobs:
         PAGE_VALUE=$((PAGE_VALUE))
 
         # Use a for loop to run a block of code n times (where n is PAGE_VALUE)
-        for ((i = PAGE_VALUE; i <= 1; i--)); do
+        for ((i = PAGE_VALUE; i >= 1; i--)); do
           echo "Running code for iteration $i"
           # Insert your code to be executed in each iteration here
           API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/secret-scanning/alerts?per_page=2&page=$i&state=open"
