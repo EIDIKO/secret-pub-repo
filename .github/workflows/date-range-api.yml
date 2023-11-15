@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       start_date:
-        description: 'Enter End date to process the Secret Scan Alerts'
+        description: 'Enter Start date to process the Secret Scan Alerts'
         required: true
         default: 'November 7, 2023 23:59:59'
       end_date:
