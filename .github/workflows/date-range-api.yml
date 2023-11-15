@@ -96,7 +96,7 @@ jobs:
           echo "Sort the array of JSON objects in ascending order based on the created_at"
           #SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')
           SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at) | reverse')
-          
+          echo "SCA Deliveries $SCA_DELIVERIES"
           for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
               _jq() {
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
