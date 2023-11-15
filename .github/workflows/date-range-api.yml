@@ -112,7 +112,7 @@ jobs:
               OLDEST_ALLOWED_TIMESTAMP=$(date -d '${{ github.event.inputs.end_date }}' --rfc-3339=seconds)
               
               
-              if [ "$CREATED_AT" \> "$START_DATE_TIMESTAMP" ]; then
+              if [ "$CREATED_AT" \< "$START_DATE_TIMESTAMP" ]; then
                 echo "In SCAlert $SAC_ALERT, CD is $CREATED_AT  older than SD $START_DATE_TIMESTAMP. Skipping further process."
                 echo "Skipping present iteration & continue"      
                 continue
