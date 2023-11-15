@@ -99,7 +99,7 @@ jobs:
               let "ISSUE_COUNT_3D_OLD+=1"
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d 'November 7, 2023 23:59:59' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d 'November 9, 2023 23:59:59' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \> "$OLDEST_ALLOWED_TIMESTAMP" ]; then
                 echo "SCAlert $SAC_ALERT is older than $OLDEST_ALLOWED_TIMESTAMP. Skipping further process."
