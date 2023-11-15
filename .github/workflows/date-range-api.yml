@@ -1,6 +1,11 @@
 name: Date Rance API Secret Sacn to Check SCAs & Create Issue for Created SCAs
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      end_date:
+        description: 'Enter End date to process the Secret Scan Alerts'
+        required: true
+        default: 'November 7, 2023 23:59:59'
   #schedule:
     #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
 jobs:
@@ -99,7 +104,7 @@ jobs:
               let "ISSUE_COUNT_3D_OLD+=1"
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d 'November 9, 2023 23:59:59' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '${{ github.event.inputs.end_date }}' --rfc-3339=seconds)
   
               if [ "$CREATED_AT" \> "$OLDEST_ALLOWED_TIMESTAMP" ]; then
                 echo "SCAlert $SAC_ALERT is older than $OLDEST_ALLOWED_TIMESTAMP. Skipping further process."
