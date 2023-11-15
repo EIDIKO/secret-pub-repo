@@ -1,17 +1,15 @@
-name: Date Range API Secret Sacn to Check SCAs & Create Issue for Created SCAs
+name: Date Range API Secret Sacn to Create Issue
 on:
   workflow_dispatch:
     inputs:
       start_date:
         description: 'Enter Start date to process the Secret Scan Alerts'
         required: true
-        default: 'November 7, 2023 23:59:59'
+        default: 'November 7, 2023 00:00:00'
       end_date:
         description: 'Enter End date to process the Secret Scan Alerts'
         required: true
         default: 'November 9, 2023 23:59:59'
-  #schedule:
-    #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
 jobs:
   create-issue:
     runs-on: ubuntu-latest    
@@ -21,7 +19,6 @@ jobs:
     - name: Extract Deliveries for Secret Scan Alerts & Create Issues
       id: extract-delivery-create-issue
       env:
-        HOOK_ID: ${{ vars.HOOK_ID }}
         I_URL: "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249"
       run: |
         TOKEN="${{ secrets.MY_PAT }}"
@@ -74,7 +71,7 @@ jobs:
 
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
-        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
+        COMMENT_BODY_ISSUES="|ALERT_STATUS|ALERT_COUNT|ISSUES_TO_CREATE|SKIPPED_ISSUES|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
         ISSUE_COUNT=0
         ISSUE_COUNT_3D_OLD=0
         ISSUE_COUNT_7D_OLD=0
@@ -104,8 +101,8 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"
               SAC_ALERT=$(_jq '.html_url')
               let "ISSUE_COUNT+=1"
-              let "ISSUE_COUNT_7D_OLD+=1"
-              let "ISSUE_COUNT_3D_OLD+=1"
+              
+              
               
               CREATED_AT=$(_jq '.created_at')
               START_DATE_TIMESTAMP=$(date -d '${{ github.event.inputs.start_date }}' --rfc-3339=seconds)
@@ -114,7 +111,8 @@ jobs:
               
               if [ "$CREATED_AT" \< "$START_DATE_TIMESTAMP" ]; then
                 echo "In SCAlert $SAC_ALERT, CD is $CREATED_AT  older than SD $START_DATE_TIMESTAMP. Skipping further process."
-                echo "Skipping present iteration & continue"      
+                echo "Skipping present iteration & continue"
+                let "ISSUE_COUNT_7D_OLD+=1"                
                 continue
               fi
 
@@ -159,6 +157,7 @@ jobs:
                 # Get Auther Username using API
                 login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
               fi
+              let "ISSUE_COUNT_3D_OLD+=1"
               echo $login_user            
               ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
               echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
