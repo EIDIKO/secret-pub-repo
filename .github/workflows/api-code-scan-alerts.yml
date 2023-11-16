@@ -126,7 +126,8 @@ jobs:
               COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
               echo "Commits: $COMMITS"
               # Get Auther Email using API
-              AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
+              AUTH_EMAIL=$(echo $COMMITS | jq -r '.commit.author.email') 
+              AUTH_NAME=$(echo $COMMITS | jq -r '.commit.author.name')
               if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
                 login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
                 echo $login_user
@@ -162,7 +163,7 @@ jobs:
               echo $ALERT_STATE
               echo $TOOL_NAME              
               echo $login_user              
-              echo $SEVERITY, $COMMIT_URL ,$FULL_REPO_NAME ,$HTML_URL,$REPO_NAME,$ALERT_NUMBER,$ALERT_STATE ,$TOOL_NAME ,$login_user 
+              echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME $COMMIT_URL ,$FULL_REPO_NAME ,$HTML_URL,$REPO_NAME,$ALERT_NUMBER,$ALERT_STATE ,$TOOL_NAME ,$login_user 
           done
           if [ "$BREAK_FLAG" == "BREAK" ]; then
             echo "Breaking External For loop"
