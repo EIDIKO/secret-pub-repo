@@ -76,7 +76,7 @@ jobs:
         PAGE_VALUE=$((PAGE_VALUE))
 
         # Use a for loop to run a block of code n times (where n is PAGE_VALUE)
-        echo SEVERITY, AUTH_NAME, AUTH_EMAIL, AUTH_NAME, REPO_NAME, FULL_REPO_NAME, COMMIT_URL, HTML_URL, ALERT_NUMBER, ALERT_STATE, TOOL_NAME, login_user > code_alert.csv 
+        echo "SEVERITY, AUTH_NAME, AUTH_EMAIL, AUTH_NAME, REPO_NAME, FULL_REPO_NAME, COMMIT_URL, HTML_URL, ALERT_NUMBER, ALERT_STATE, TOOL_NAME, login_user" > code_alert.csv 
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
           # Insert your code to be executed in each iteration here
@@ -155,7 +155,7 @@ jobs:
               issue_data="${issue_data//ASS_TYPE/$ASS_TYPE}"
               COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
               echo "++++++++++++++++++++++++++++++++++"            
-              echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user} >> code_alert.csv         
+              echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user}" >> code_alert.csv         
               echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
           
           done
