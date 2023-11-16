@@ -16,7 +16,7 @@ jobs:
       run: |
         TOKEN="${{ secrets.NOT_MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=10&page=1&state=open"      
+        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open"      
         BREAK_FLAG="DONT_BREAK"
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
