@@ -1,6 +1,22 @@
 name: API Code Sacn Alerts Processing
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      direction:
+        description: 'Enter direction to process the Code Scan Alerts'
+        required: true
+        default: 'asc'
+        options:
+          - 'asc'
+          - 'desc'
+      start_date:
+        description: 'Enter Start date to process the Code Scan Alerts'
+        required: true
+        default: 'November 7, 2023 00:00:00'
+      end_date:
+        description: 'Enter End date to process the Code Scan Alerts'
+        required: true
+        default: 'November 9, 2023 23:59:59'
   #schedule:
     #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
 jobs:
