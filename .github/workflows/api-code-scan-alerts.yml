@@ -32,7 +32,7 @@ jobs:
       run: |
         TOKEN="${{ secrets.NOT_MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open"      
+        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open&sort=created&direction=asc"      
         BREAK_FLAG="DONT_BREAK"
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
@@ -81,7 +81,8 @@ jobs:
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
           
           echo "Sort the array of JSON objects in ascending order based on the created_at"
-          SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')         
+          #SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')
+          SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at) | reverse')          
           for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
               _jq() {
                 echo "${SCA}" | base64 --decode | jq -r "${1}"
@@ -89,19 +90,27 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"
               SAC_ALERT=$(_jq '.html_url')
               let "ISSUE_COUNT+=1"
-              let "ISSUE_COUNT_7D_OLD+=1"
               let "ISSUE_COUNT_3D_OLD+=1"
               
               CREATED_AT=$(_jq '.created_at')
-              OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
-  
-              # if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
-                # echo "SCAlert $SAC_ALERT is older than 24 hours. Skipping further process."
-                # echo "Exiting workflow as remaining SCAs are also older than 24 hrs"
-                # BREAK_FLAG="BREAK"
-                # break
-              # fi
-              #echo "SCAlert $SAC_ALERT is not older than 24 hours"
+              START_DATE_TIMESTAMP=$(date -d '${{ github.event.inputs.start_date }}' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '${{ github.event.inputs.end_date }}' --rfc-3339=seconds)
+              
+              if [ "$CREATED_AT" \< "$START_DATE_TIMESTAMP" ]; then
+                echo "In CSAlert $SAC_ALERT, CD is $CREATED_AT  older than SD $START_DATE_TIMESTAMP. Skipping further process."
+                echo "Skipping present iteration & continue"
+                let "ISSUE_COUNT_7D_OLD+=1"                
+                continue
+              fi
+              
+              if [ "$CREATED_AT" \> "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+                echo "CSAlert $SAC_ALERT is older than $OLDEST_ALLOWED_TIMESTAMP."
+                echo "Exiting workflow as remaining CSAs are also newer"
+                REL="BREAK"
+                break
+              fi
+              
+              
               SEVERITY=$(_jq '.rule.security_severity_level')
               HTML_URL=$(_jq '.html_url')
               ALERT_NUMBER=$(_jq '.number')
