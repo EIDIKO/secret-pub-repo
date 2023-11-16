@@ -16,52 +16,8 @@ jobs:
       run: |
         TOKEN="${{ secrets.NOT_MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=10&page=1&state=open"
-        SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
-        HEADERS=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
-        HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
-        LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
-        REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
-        NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
-        SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
-        echo "Status: $HTTP_STATUS"
-        #echo "LINK: $LINK_HEADER"
-        echo "FIRST_URL: $NEXT_URL"
-        echo "FIRST_REL: $REL"
-        IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
-        SECOND_URL="${URL_ARRAY[1]}"
-        SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
-        echo "SECOND_URL: $SECOND_URL"
+        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=10&page=1&state=open"      
         BREAK_FLAG="DONT_BREAK"
-        
-
-        if [ -z "$LINK_HEADER" ]; then
-            echo "LINK_HEADER is null or empty"
-          else
-            echo "LINK_HEADER is not null or empty and is: $LINK_HEADER"
-        fi
-        
-        if [ -z "$NEXT_URL" ]; then
-            echo "NEXT_URL is null or empty"
-          else
-            echo "NEXT_URL is not null or empty and is: $NEXT_URL"
-        fi
-        
-        if [ -z "$SECOND_URL" ]; then
-            echo "SECOND_URL is null or empty"
-            PAGE_VALUE="1"
-          else
-            echo "SECOND_URL is not null or empty and is: $SECOND_URL"
-            PAGE_VALUE=$(echo "$SECOND_URL" | awk -F'&page=' '{print $2}' | awk -F'&' '{print $1}')
-        fi
-        
-        
-        if [ "$HTTP_STATUS" != "200" ]; then
-          echo "No deliveries found or error in API response, exiting smoothly"
-          echo $SCAs
-          exit 0
-        fi
-
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
         COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
@@ -69,22 +25,46 @@ jobs:
         ISSUE_COUNT_3D_OLD=0
         ISSUE_COUNT_7D_OLD=0
 
-
-        echo "Page Value: $PAGE_VALUE"
-
-        # Convert PAGE_VALUE to an integer
-        PAGE_VALUE=$((PAGE_VALUE))
-
-        # Use a for loop to run a block of code n times (where n is PAGE_VALUE)
         echo "SEVERITY, AUTH_NAME, AUTH_EMAIL, AUTH_NAME, REPO_NAME, FULL_REPO_NAME, COMMIT_URL, HTML_URL, ALERT_NUMBER, ALERT_STATE, TOOL_NAME, login_user" > code_alert.csv 
-        for ((i = 1; i <= PAGE_VALUE; i++)); do
+        for ((i = 1; i <= 0; i++)); do
           echo "Running code for iteration $i"
-          # Insert your code to be executed in each iteration here
-          #API_URL="$BASE_URL/orgs/${{ github.repository_owner }}/code-scanning/alerts?per_page=10&page=$i&state=open"
-          API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=10&page=$i&state=open"
+
           echo "API_URL: $API_URL"
+
           SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+          HEADERS=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+          HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+          
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "No deliveries found or error in API response, exiting smoothly"
+            echo $SCAs
+            i=$((-1))
+            exit 0
+          fi
+          
+          
+          LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+          REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+          NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+          echo "Status: $HTTP_STATUS"
+          #echo "LINK: $LINK_HEADER"
+          echo "FIRST_URL: $NEXT_URL"
+          echo "FIRST_REL: $REL"
+          IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
+          SECOND_URL="${URL_ARRAY[1]}"
+          SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
+          echo "SECOND_URL: $SECOND_URL"
+
+          if [ -z "$SECOND_URL" ]; then
+              echo "SECOND_URL is null or empty"
+              API_URL=$NEXT_URL
+            else
+              echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+              API_URL=$SECOND_URL
+          fi          
+          
           SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+          
           echo "Sort the array of JSON objects in ascending order based on the created_at"
           SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')         
           for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
@@ -187,5 +167,5 @@ jobs:
     - name: Upload Scanned alerts by repo name
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: code_alert.csv
+        name: Code_Scan_Alerts
         path: code_alert.csv
