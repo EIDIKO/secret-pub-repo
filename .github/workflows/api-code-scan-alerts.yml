@@ -76,6 +76,7 @@ jobs:
         PAGE_VALUE=$((PAGE_VALUE))
 
         # Use a for loop to run a block of code n times (where n is PAGE_VALUE)
+        echo SEVERITY, AUTH_NAME, AUTH_EMAIL, AUTH_NAME, REPO_NAME, FULL_REPO_NAME, COMMIT_URL, HTML_URL, ALERT_NUMBER, ALERT_STATE, TOOL_NAME, login_user > code_alert.csv 
         for ((i = 1; i <= PAGE_VALUE; i++)); do
           echo "Running code for iteration $i"
           # Insert your code to be executed in each iteration here
@@ -124,7 +125,7 @@ jobs:
               # Get Commiter details using API
               
               COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
-              echo "Commits: $COMMITS"
+              #echo "Commits: $COMMITS"
               # Get Auther Email using API
               AUTH_EMAIL=$(echo $COMMITS | jq -r '.commit.author.email') 
               AUTH_NAME=$(echo $COMMITS | jq -r '.commit.author.name')
@@ -140,7 +141,7 @@ jobs:
               fi
               echo $login_user            
               #ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SEVERITY\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
-              echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              #echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
               ISSUE_URL=$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
               ISSUE_NUMBER=$(echo $ISSUE_RESPONSE | jq -r '.number') 
               REPO_URL=$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
@@ -153,17 +154,10 @@ jobs:
               issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
               issue_data="${issue_data//ASS_TYPE/$ASS_TYPE}"
               COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
-              echo "++++++++++++++++++++++++++++++++++"
-              echo $SEVERITY
-              echo $COMMIT_URL
-              echo $FULL_REPO_NAME
-              echo $HTML_URL
-              echo $REPO_NAME
-              echo $ALERT_NUMBER
-              echo $ALERT_STATE
-              echo $TOOL_NAME              
-              echo $login_user              
-              echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME $COMMIT_URL ,$FULL_REPO_NAME ,$HTML_URL,$REPO_NAME,$ALERT_NUMBER,$ALERT_STATE ,$TOOL_NAME ,$login_user 
+              echo "++++++++++++++++++++++++++++++++++"            
+              echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user} >> code_alert.csv         
+              echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
+          
           done
           if [ "$BREAK_FLAG" == "BREAK" ]; then
             echo "Breaking External For loop"
@@ -190,3 +184,8 @@ jobs:
     - name: Issue Created
       if: success()
       run: echo "GitHub issue created successfully."
+    - name: Upload Scanned alerts by repo name
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: code_alert.csv
+        path: code_alert.csv
