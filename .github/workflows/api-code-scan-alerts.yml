@@ -124,7 +124,7 @@ jobs:
               # Get Commiter details using API
               
               COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
-              #echo $COMMITS
+              echo "Commits: $COMMITS"
               # Get Auther Email using API
               AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
               if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
