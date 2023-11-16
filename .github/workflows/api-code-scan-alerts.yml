@@ -41,8 +41,7 @@ jobs:
             i=$((0))
             exit 0
           fi
-          
-          
+                    
           LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
           REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
           NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
@@ -97,12 +96,6 @@ jobs:
               REPO_NAME=$(_jq '.repository.name')
               FULL_REPO_NAME=$(_jq '.repository.full_name')
               COMMIT_URL="https://api.github.com/repos/$FULL_REPO_NAME/commits/$COMMIT_SHA"
-              # Get Locations using API
-              # LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
-              # echo $LOCATIONS
-              # COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
-              # echo $COMMIT_URL
-              # Get Commiter details using API
               
               COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
               #echo "Commits: $COMMITS"
@@ -137,9 +130,9 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"            
               echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user}" >> code_alert.csv         
               echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
-          
+              
           done
-          if [ "$BREAK_FLAG" == "BREAK" ]; then
+          if [ "$FIRST_REL" != "next" ]; then
             echo "Breaking External For loop"
             break
           fi
