@@ -132,7 +132,8 @@ jobs:
               echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
               
           done
-          if [ "$FIRST_REL" != "next" ]; then
+          echo "REL: $REL"
+          if [ "$REL" != "next" ]; then
             echo "Breaking External For loop"
             break
           fi
