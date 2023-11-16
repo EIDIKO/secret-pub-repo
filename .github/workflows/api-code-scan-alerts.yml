@@ -85,7 +85,7 @@ jobs:
                 # BREAK_FLAG="BREAK"
                 # break
               # fi
-              echo "SCAlert $SAC_ALERT is not older than 24 hours"
+              #echo "SCAlert $SAC_ALERT is not older than 24 hours"
               SEVERITY=$(_jq '.rule.security_severity_level')
               HTML_URL=$(_jq '.html_url')
               ALERT_NUMBER=$(_jq '.number')
