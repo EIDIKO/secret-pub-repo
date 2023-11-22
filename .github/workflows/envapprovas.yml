@@ -63,10 +63,10 @@ jobs:
           echo $template
 
           echo "2"
-          template=$(echo "${{ github.event.issue.body }}" | grep -oP '### Template\n\n\K[^\n]+')
-          reponame=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository name\n\n\K[^\n]+')
-          repodescription=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository Description\n\n\K[^\n]+')
-          access=$(echo "${{ github.event.body }}" | grep -oP '### ACCESS AND PERMISSION\n\n\K[^\n]+')
+          template=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $1; exit}')
+          repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $2; exit}')
+          access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $3; exit}')
           echo $template
           echo $reponame
           echo $repodescription
