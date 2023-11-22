@@ -58,6 +58,7 @@ jobs:
           
           template=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $3; exit}')
+          permission=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Permission/{sub(/^[[:space:]]*/, ""); print $3; exit}')
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
@@ -66,15 +67,15 @@ jobs:
           echo "::set-output name=repo-name::${reponame}"
           echo "RD: $repodescription"
           echo "::set-output name=repo-desc::${repodescription}"
-          echo "A: $access"
-          echo "::set-output name=repo-owner::${access}"
+          echo "P: $permission"
+          echo "::set-output name=repo-owner::${permission}"
           echo "N: $notes"
           REPO_NAME="${{ github.repository }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for your patience! \n \
-                      We are processing your request for Repo Creation with name : **$reponame** for **$reponame**"
+                      We are processing your request for Repo Creation with name : **$reponame** for **$permission**"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
