@@ -32,7 +32,14 @@ body:
       value: add here
   validations:
       required: true
-
+- type: input
+  attributes:
+      label: Repository Permission 
+      description: Give a use or group name here.
+      placeholder: tirapa-kellogs
+      value: atirapa-kellogs
+  validations:
+      required: true
 
 - type: input
   attributes:
