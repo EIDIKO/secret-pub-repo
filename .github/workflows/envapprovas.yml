@@ -54,6 +54,9 @@ jobs:
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_body="${{ github.event.issue.body }}"
+          echo "1"
+          echo "${{ github.event.issue.body }}" | grep -oP '### Template\n\n\K[^\n]+'
+          echo "2"
           template=$(echo "${{ github.event.issue.body }}" | grep -oP '### Template\n\n\K[^\n]+')
           reponame=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository name\n\n\K[^\n]+')
           repodescription=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository Description\n\n\K[^\n]+')
