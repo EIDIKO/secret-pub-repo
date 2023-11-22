@@ -55,6 +55,8 @@ jobs:
         run: |
           issue_body="${{ github.event.issue.body }}"
           echo "1"
+          template1=$(echo "${{ github.event.body }}" | awk '/^### / {if (inside) {print ""; inside=0} else {inside=1; next} } inside {print $0}')
+          echo $template1
           template=$(echo "${{ github.event.issue.body }}" | awk '/^### / {if (inside) {print ""; inside=0} else {inside=1; next} } inside {print $0}' | awk 'BEGIN{ORS="\n"}{print}')
           echo $template
 
