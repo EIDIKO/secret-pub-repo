@@ -54,6 +54,7 @@ jobs:
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_body="${{ github.event.issue.body }}"
+          echo "issue_body: $issue_body"
           IFS="###" read -ra sections <<< "$issue_body"
         
           for section in "${sections[@]}"; do
@@ -138,7 +139,7 @@ jobs:
             -d '{
               "name": "'$REPO_NAME'",
               "description": "${{ needs.review_repo_request.outputs.repo-desc }}",
-              "private": false,
+              "private": true,
               "has_issues": true,
               "has_projects": true,
               "has_wiki": true,
