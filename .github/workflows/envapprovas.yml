@@ -61,21 +61,17 @@ jobs:
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
-          echo $template
-          echo $reponame
+          echo "T: $template"
+          echo "RN: $reponame"
           echo "::set-output name=repo-name::${reponame}"
-          echo $repodescription
+          echo "RD: $repodescription"
           echo "::set-output name=repo-desc::${repodescription}"
-          echo $access
+          echo "A: $access"
           echo "::set-output name=repo-owner::${access}"
-          echo $notes
-          echo "::set-output name=repo-notes::${notes}"
-          #echo '${{ toJson(github.event) }}'
-          
+          echo "N: $notes"
           REPO_NAME="${{ github.repository }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
-
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for your patience! \n \
                       We are processing your request for Repo Creation with name : **$reponame** for **$reponame**"
