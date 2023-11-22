@@ -55,7 +55,7 @@ jobs:
         run: |
           issue_body="${{ github.event.issue.body }}"
           echo "1"
-          template=$(echo "${{ github.event.body }}" | awk -v RS="### " '/^Template/{print $0; exit}')
+          template=$(echo "${{ github.event.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           echo $template
 
           echo "2"
