@@ -64,13 +64,18 @@ jobs:
 
           echo "2"
           template=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
-          reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $2; exit}')
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          repodescription=$(echo "$repodescription" | awk -F 'Repository Description ' '{print $2}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          access=$(echo "$access" | awk -F 'ACCESS AND PERMISSION ' '{print $2}')
+          notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          notes=$(echo "$notes" | awk -F 'ADDITIONAL NOTES ' '{print $2}')
           echo $template
           echo $reponame
           echo $repodescription
           echo $access
+          echo $notes
 
           echo '${{ toJson(github.event) }}'
           echo "issue_body: $issue_body"
