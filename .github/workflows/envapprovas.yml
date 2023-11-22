@@ -60,7 +60,7 @@ jobs:
           reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $3; exit}')
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
-          notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $3; exit}')
+          notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           echo $template
           echo $reponame
           echo "::set-output name=repo-name::${reponame}"
@@ -78,7 +78,7 @@ jobs:
 
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for your patience! \n \
-                      We are processing your request for Repo Creation with name : **$reponame** for **$notes**"
+                      We are processing your request for Repo Creation with name : **$reponame** for **$reponame**"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
