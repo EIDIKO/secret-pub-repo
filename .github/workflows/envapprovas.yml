@@ -54,73 +54,30 @@ jobs:
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_body="${{ github.event.issue.body }}"
-          echo "1"
-          template2=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
-           echo $template2
-          template1=$(echo "${{ github.event.issue.body }}" | awk '/^### / {if (inside) {print ""; inside=0} else {inside=1; next} } inside {print $0}')
-          echo $template1
-          template=$(echo "${{ github.event.issue.body }}" | awk '/^### / {if (inside) {print ""; inside=0} else {inside=1; next} } inside {print $0}' | awk 'BEGIN{ORS="\n"}{print}')
-          echo $template
-
-          echo "2"
+          
           template=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $0; exit}')
-          reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $0; exit}')
+          reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $3; exit}')
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           echo $template
           echo $reponame
+          echo "::set-output name=repo-name::${reponame}"
           echo $repodescription
+          echo "::set-output name=repo-desc::${repodescription}"
           echo $access
+          echo "::set-output name=repo-owner::${access}"
           echo $notes
-
+          echo "::set-output name=repo-notes::${notes}"
           echo '${{ toJson(github.event) }}'
-          echo "issue_body: $issue_body"
-          IFS="###" read -ra sections <<< "$issue_body"
-        
-          for section in "${sections[@]}"; do
-            if [ -n "$section" ]; then
-              echo "Section: $section"
-            fi
-          done
-          property_names=("NAME_OF_REPOSITORY" "PURPOSE_OF_REPOSITORY" "TEAM_OR_INDIVIDUAL_REQUSTIN" "PRIMARY_CONTACT" "REPOSITORY_DESCRIPTION" "ACCESS_AND_PERMISSION" "ACCESS_CONTROL" "BRANCHING_STRATEGY" "COLLABORATORS" "SECURITY_AND_COMPLIANCE" "ADDITIONAL_NOTES")
-          TOKEN="${{ secrets.MY_PAT }}"    
-          declare -A property_values
-          echo "==========================================="
-          for property_name in "${property_names[@]}"; do
-            echo "++++++++++++++++++++++++++++++++++++++++++"
-            property_value=$(echo "$issue_body" | sed -n "/$property_name/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/$property_name/ s/^.*: *//")
-            echo "$property_name"
-            extracted_value=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-            echo "$extracted_value"
-            if [ "$property_name" == "NAME_OF_REPOSITORY" ]; then
-              NAME_OF_REPOSITORY=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-              #echo "repo-name=$NAME_OF_REPOSITORY" >> $GITHUB_OUTPUT
-              echo "::set-output name=repo-name::${NAME_OF_REPOSITORY}"
-              echo "NAME_OF_REPOSITORY: $NAME_OF_REPOSITORY"
-            fi
-            if [ "$property_name" == "TEAM_OR_INDIVIDUAL_REQUSTIN" ]; then
-              TEAM_OR_INDIVIDUAL_REQUSTIN=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-              #echo "repo-owner=$TEAM_OR_INDIVIDUAL_REQUSTIN" >> $GITHUB_OUTPUT
-              echo "::set-output name=repo-owner::${TEAM_OR_INDIVIDUAL_REQUSTIN}"
-              echo "TEAM_OR_INDIVIDUAL_REQUSTIN: $TEAM_OR_INDIVIDUAL_REQUSTIN"
-            fi
-            if [ "$property_name" == "REPOSITORY_DESCRIPTION" ]; then
-              REPOSITORY_DESCRIPTION=$(echo "$property_value" | sed -n 's/.*\[\(.*\)\].*/\1/p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-              #echo "repo-desc=$REPOSITORY_DESCRIPTION" >> $GITHUB_OUTPUT
-              echo "::set-output name=repo-desc::${REPOSITORY_DESCRIPTION}"
-              echo "REPOSITORY_DESCRIPTION: $REPOSITORY_DESCRIPTION"
-            fi
           
-            echo "++++++++++++++++++++++++++++++++++++++++++"
-          done
           REPO_NAME="${{ github.repository }}"
           ORG_OR_OWNER="${{ github.repository_owner }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
-          #TOBE_REPO2 = $(echo "$issue_body" | sed -n "/"NAME_OF_REPOSITORY"/,/## / p" | grep -v -E "^\[.*\]$" | sed -e "/"NAME_OF_REPOSITORY"/ s/^.*: *//")
+
           echo "::set-output name=issue-number::${ISSUE_NUMBER}"
           COMMENT_BODY="Thank you for your patience! \n \
-                      We are processing your request for Repo Creation with name : **$NAME_OF_REPOSITORY** for **$TEAM_OR_INDIVIDUAL_REQUSTIN**"
+                      We are processing your request for Repo Creation with name : **$reponame** for **$access**"
           curl -X POST \
             -u "$TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
