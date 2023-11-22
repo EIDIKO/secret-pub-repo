@@ -54,6 +54,15 @@ jobs:
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_body="${{ github.event.issue.body }}"
+          template=$(echo "${{ github.event.issue.body }}" | grep -oP '### Template\n\n\K[^\n]+')
+          reponame=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository name\n\n\K[^\n]+')
+          repodescription=$(echo "${{ github.event.issue.body }}" | grep -oP '### Repository Description\n\n\K[^\n]+')
+          access=$(echo "${{ github.event.body }}" | grep -oP '### ACCESS AND PERMISSION\n\n\K[^\n]+')
+          echo $template
+          echo $reponame
+          echo $repodescription
+          echo $access
+
           echo '${{ toJson(github.event) }}'
           echo "issue_body: $issue_body"
           IFS="###" read -ra sections <<< "$issue_body"
