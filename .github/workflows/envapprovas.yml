@@ -55,7 +55,7 @@ jobs:
         run: |
           issue_body="${{ github.event.issue.body }}"
           echo "1"
-          template=$(echo "${{ github.event.body }}" | grep -oP '### Template \K[\s\S]*?(?=###|$)')
+          template=$(echo "${{ github.event.body }}" | awk -v RS="### " '/^Template/{print $0; exit}')
           echo $template
 
           echo "2"
