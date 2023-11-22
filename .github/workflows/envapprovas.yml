@@ -52,6 +52,7 @@ jobs:
         env:
           HOOK_ID: ${{ vars.HOOK_ID }}
           issue-url: ${{ github.event.issue.html_url  }}
+          TOKEN: ${{ secrets.MY_PAT }} 
         run: |
           issue_body="${{ github.event.issue.body }}"
           
