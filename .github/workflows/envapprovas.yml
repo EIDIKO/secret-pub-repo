@@ -54,7 +54,7 @@ jobs:
           issue-url: ${{ github.event.issue.html_url  }}
         run: |
           issue_body="${{ github.event.issue.body }}"
-          echo "EVENT: ${{ github.event}}"
+          echo '${{ toJson(github.event) }}'
           echo "issue_body: $issue_body"
           IFS="###" read -ra sections <<< "$issue_body"
         
