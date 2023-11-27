@@ -181,7 +181,7 @@ jobs:
       - name: Checkout Newly Created Repo
         uses: actions/checkout@v2
         with:
-          repository: EIDIKO/${{ needs.review_repo_request.outputs.repo-name }}
+          repository: ${{ github.repository_owner }}/${{ needs.review_repo_request.outputs.repo-name }}
           ref: main
           token: ${{ secrets.MY_PAT }}
       - name: Use Template to Update Repo
