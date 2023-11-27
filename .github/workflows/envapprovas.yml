@@ -61,7 +61,7 @@ jobs:
           
           template=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Template/{sub(/^[[:space:]]*/, ""); print $3; exit}')
           reponame=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository name/{sub(/^[[:space:]]*/, ""); print $3; exit}')
-          permission=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Permission/{sub(/^[[:space:]]*/, ""); print $3; exit}')
+          permission=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Permission/{sub(/^[[:space:]]*/, ""); print $3; exit}' | tr -d '[:space:]')
           repodescription=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^Repository Description/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
