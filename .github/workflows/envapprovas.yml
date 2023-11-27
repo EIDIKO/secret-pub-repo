@@ -76,6 +76,8 @@ jobs:
           echo "RN: $reponame"
           echo "::set-output name=repo-name::${reponame}"
           echo "RD: $repodescription"
+          repodescription=$(echo "$repodescription" | tr -d '\n')
+          echo "ARD: $repodescription"
           echo "::set-output name=repo-desc::${repodescription}"
           echo "P: $permission"
           echo "::set-output name=repo-owner::${permission}"
