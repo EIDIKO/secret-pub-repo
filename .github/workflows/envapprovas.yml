@@ -102,6 +102,8 @@ jobs:
       name: approve
       url: "${{ github.event.issue.html_url  }}"
     steps:
+      - name: Checkout Current Repo
+        uses: actions/checkout@v2
       - name: Create Repository
         env:
           HOOK_ID: ${{ vars.HOOK_ID }} 
