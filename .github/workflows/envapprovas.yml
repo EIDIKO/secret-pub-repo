@@ -11,6 +11,7 @@ jobs:
       repo-name: ${{ steps.extract-properties.outputs.repo-name }}
       repo-owner: ${{ steps.extract-properties.outputs.repo-owner }}
       repo-desc: ${{ steps.extract-properties.outputs.repo-desc }}
+      template: ${{ steps.extract-properties.outputs.template }}
       issue-url: ${{ github.event.issue.html_url  }} 
     environment: 
       name: review
@@ -63,6 +64,13 @@ jobs:
           access=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ACCESS AND PERMISSION/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="### " '/^ADDITIONAL NOTES/{sub(/^[[:space:]]*/, ""); print $0; exit}')
           echo "T: $template"
+          if [ "$template" == "Basic" ]; then
+            template="basicTemplate"
+          else
+            template="advTemplate"
+          fi
+          echo "::set-output name=template::${template}"
+          echo "Template: $template"
           echo "RN: $reponame"
           echo "::set-output name=repo-name::${reponame}"
           echo "RD: $repodescription"
@@ -157,7 +165,37 @@ jobs:
                  }'
                 echo "'message' field does not exist in JSON."
              fi
-              
+      - name: Handle Template 
+        run: |
+          TEMPLATE="${{ needs.review_repo_request.outputs.template }}"
+          echo "TEMPLATE: $TEMPLATE"
+          git remote -v
+          mkdir ../$TEMPLATE
+          cp -r $TEMPLATE/* ../$TEMPLATE
+          pwd
+          ls -lrt 
+      - name: Checkout Newly Created Repo
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ needs.review_repo_request.outputs.repo-owner }}/${{ needs.review_repo_request.outputs.repo-name }}
+          ref: main
+          token: ${{ secrets.MY_PAT }}
+      - name: Use Template to Update Repo
+        run: |
+          TEMPLATE="${{ needs.review_repo_request.outputs.template }}"
+          git remote -v
+          cp -r ../$TEMPLATE/* ./
+          pwd
+          ls -lrt
+          git config --global user.email "tirapareddy.tondapu@kellogg.com"
+          git config --global user.name "Tirapa Reddy Tondapu"
+          echo "1"
+          git add .
+          echo "2"
+          git commit -m "Initial Commit"
+          echo "3"
+          git push
+          echo "4"
       - name: Add Collaborator
         run: |
           TOKEN="${{ secrets.MY_PAT }}"
