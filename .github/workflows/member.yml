@@ -1,0 +1,19 @@
+name: Member Added
+
+on:
+  member:
+    types:
+      - added
+
+jobs:
+  get-user-details:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Get User Details
+        run: |
+          echo "Triggered"
+
