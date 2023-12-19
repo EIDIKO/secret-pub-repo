@@ -14,8 +14,7 @@ jobs:
       env:
         HOOK_ID: ${{ vars.ORG_USER_HOOK_ID }}
       run: |
-        # NOTE: Create a repo secret MY_PAT to store a PAT, create a repo variable HOOK_ID to store org webhook id
-        # Extracting Deliverys from the webhook payload
+
         TOKEN="${{ secrets.ORG_USER_PAT }}"
         echo "HOOK $HOOK_ID"
         BASE_URL="https://api.github.com"
@@ -37,7 +36,7 @@ jobs:
           echo $BODY
           exit 0
         fi
-        #SCA_DELIVERIES=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/orgs/${{ github.repository_owner }}/hooks/$HOOK_ID/deliveries")
+
         echo "Sort the array of JSON objects in ascending order based on the ID field"
         SCA_DELIVERIES=$(echo "$BODY" | jq 'sort_by(.id)')        
         for DELIVERY in $(echo "${BODY}" | jq -r '.[] | @base64'); do
@@ -58,21 +57,19 @@ jobs:
             echo "Webhook Payload"
             ACTION=$(echo "$PAYLOAD" | jq -r '.action')
             EVENT=$(echo "$PAYLOAD" | jq -r '.event')
-            if [ "$EVENT" == "push" ]; then
-              echo "Action is null & Event is $EVENT"
-              PUSHER_NAME=$(echo "$PAYLOAD" | jq -r '.request.payload.pusher.name')
-              echo "PUSHER $PUSHER_NAME"
-            fi
-            echo "Out PUSHER $PUSHER_NAME"
-            echo "Webhook Payload $DELIVERY_ID $EVENT $ACTION"
-            if [ "$EVENT" != "secret_scanning_alert" ]; then
-              echo "Event is not 'secret_scanning_alert'. Skipping further process for delivery ID: $DELIVERY_ID"
+
+            echo "Webhook Payload's DELIVERYID: $DELIVERY_ID EVENT: $EVENT ACTION: $ACTION"
+            
+            if [ "$EVENT" != "organization" ]; then
+              echo "Event is not 'organization'. Skipping further process for delivery ID: $DELIVERY_ID"
               continue
             fi
-            if [ "$ACTION" != "created" ]; then
-              echo "Action is not 'created'. Skipping further process for delivery ID: $DELIVERY_ID"
+            
+            if [ "$ACTION" != "member_added" ]; then
+              echo "Action is not 'member_added'. Skipping further process for delivery ID: $DELIVERY_ID"
               continue
             fi
+            
             CREATED_AT=$(echo "$PAYLOAD" | jq -r '.created_at')
             OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
 
@@ -81,40 +78,18 @@ jobs:
               continue
             fi
             echo "Delivery ID $DELIVERY_ID is not older than 24 hours"
-            SECRET=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.secret_type')
-            HTML_URL=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.html_url')
+            ADDED_USER=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.login')
+            HTML_URL=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.html_url')
             ALERT_NUMBER=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.number')
-            LOCATIONS_URL=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.locations_url')
-            REPO_NAME=$(echo "$PAYLOAD" | jq -r '.request.payload.repository.name')
-            FULL_REPO_NAME=$(echo "$PAYLOAD" | jq -r '.request.payload.repository.full_name')
-            echo $SECRET
-            echo $LOCATIONS_URL
+            echo "Current Repository Name: $GITHUB_REPOSITORY"
+            FULL_REPO_NAME="secret-pub-repo"
+            echo $ADDED_USER
             echo $FULL_REPO_NAME
             echo $HTML_URL
-            echo $REPO_NAME
-            echo $ALERT_NUMBER
-            # Get Locations using API
-            LOCATIONS=$(curl -s -X GET -u "$TOKEN" "$LOCATIONS_URL")
-            echo $LOCATIONS
-            COMMIT_URL=$(echo $LOCATIONS | jq -r '.[0].details.commit_url')
-            echo $COMMIT_URL
-            # Get Commiter details using API
-            COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
-            #echo $COMMITS
-            # Get Auther Email using API
-            AUTH_EMAIL=$(echo $COMMITS | jq -r '.author.email')          
-            if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
-              login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
-              echo $login_user
-            else
-              echo $AUTH_EMAIL
-              COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
-              #echo $COMMITS_AUTH_DETAILS
-              # Get Auther Username using API
-              login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
-            fi
-            echo $login_user            
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SECRET\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+
+
+         
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$ACTION_$ADDED_USER\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"         
         done    
