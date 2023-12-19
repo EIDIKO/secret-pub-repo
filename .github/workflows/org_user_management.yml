@@ -81,15 +81,12 @@ jobs:
             ADDED_USER=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.login')
             HTML_URL=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.html_url')
             ALERT_NUMBER=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.number')
+           
             echo "Current Repository Name: $GITHUB_REPOSITORY"
-            FULL_REPO_NAME="secret-pub-repo"
             echo $ADDED_USER
-            echo $FULL_REPO_NAME
             echo $HTML_URL
-
-
          
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$ACTION_$ADDED_USER\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$ACTION_$ADDED_USER\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$GITHUB_REPOSITORY/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"         
         done    
