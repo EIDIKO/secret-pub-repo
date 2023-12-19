@@ -72,7 +72,7 @@ jobs:
             echo "Webhook Payload: $PAYLOAD"
             CREATED_AT=$(echo "$PAYLOAD" | jq -r '.delivered_at')
             OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
-            OLDEST_ALLOWED_TIMESTAMP=$(date -d "$OLDEST_ALLOWED_TIMESTAMP" --rfc-3339=seconds)
+            CREATED_AT=$(date -d "$CREATED_AT" --rfc-3339=seconds)
             echo "CREATED_AT: $CREATED_AT"
             echo "OLDEST_ALLOWED_TIMESTAMP: $OLDEST_ALLOWED_TIMESTAMP"
             if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
