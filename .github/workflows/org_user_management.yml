@@ -86,7 +86,7 @@ jobs:
             echo $ADDED_USER
             echo $HTML_URL
          
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$ACTION_$ADDED_USER\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$GITHUB_REPOSITORY/issues")
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"${ACTION}_${ADDED_USER}\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$GITHUB_REPOSITORY/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"         
         done    
