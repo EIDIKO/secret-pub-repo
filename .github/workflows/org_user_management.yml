@@ -83,7 +83,7 @@ jobs:
             ALERT_NUMBER=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.number')
             ORG=$(echo "$PAYLOAD" | jq -r '.request.payload.organization.login')
             echo "Current Repository Name: $GITHUB_REPOSITORY"
-            BODY= "Hi @${ADDED_USER}, You have been added to a new organization. Welcome to ${ORG}."
+            BODY="Hi @${ADDED_USER},\n You have been added to a new organization.\n Welcome to ${ORG}."
             echo $ADDED_USER
             echo $HTML_URL
          
