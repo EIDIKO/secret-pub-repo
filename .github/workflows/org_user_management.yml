@@ -81,12 +81,13 @@ jobs:
             ADDED_USER=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.login')
             HTML_URL=$(echo "$PAYLOAD" | jq -r '.request.payload.membership.user.html_url')
             ALERT_NUMBER=$(echo "$PAYLOAD" | jq -r '.request.payload.alert.number')
-           
+            ORG=$(echo "$PAYLOAD" | jq -r '.request.payload.organization.login')
             echo "Current Repository Name: $GITHUB_REPOSITORY"
+            BODY= "Hi @$ADDED_USER, \n You $HTML_URL has been added to a new organization. \n Welcome to $ORG."
             echo $ADDED_USER
             echo $HTML_URL
          
-            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"${ACTION}_${ADDED_USER}\",\"body\":\"$HTML_URL\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$GITHUB_REPOSITORY/issues")
+            ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"${ACTION}_${ADDED_USER}\",\"body\":\"$BODY\",\"assignees\":[\"$ADDED_USER\"]}" "$BASE_URL/repos/$GITHUB_REPOSITORY/issues")
             echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
             echo "++++++++++++++++++++++++++++++++++"         
         done    
