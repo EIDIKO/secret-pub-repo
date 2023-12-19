@@ -71,7 +71,7 @@ jobs:
             fi
             
             CREATED_AT=$(echo "$PAYLOAD" | jq -r '.created_at')
-            OLDEST_ALLOWED_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
+            OLDEST_ALLOWED_TIMESTAMP=$(date -d '1 hours ago' --rfc-3339=seconds)
 
             if [ "$CREATED_AT" \< "$OLDEST_ALLOWED_TIMESTAMP" ]; then
               echo "Delivery ID $DELIVERY_ID is older than 24 hours. Skipping further process."
