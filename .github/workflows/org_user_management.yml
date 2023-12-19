@@ -1,4 +1,4 @@
-name: Check Added Users in Org &  & Create an Issue.
+name: Check Added Users in Org & Create an Issue.
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2    
-    - name: Extract Deliveries of Newly Added Users in Org &  & Create an Issue.
+    - name: Extract Deliveries of Newly Added Users in Org & Create an Issue.
       id: extract-delivery-create-issue
       env:
         HOOK_ID: ${{ vars.ORG_USER_HOOK_ID }}
