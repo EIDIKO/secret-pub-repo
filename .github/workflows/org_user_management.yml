@@ -73,7 +73,7 @@ jobs:
             #echo "Webhook Payload: $PAYLOAD"
             echo "HRS : $HRS"
             CREATED_AT=$(echo "$PAYLOAD" | jq -r '.delivered_at')
-            OLDEST_ALLOWED_TIMESTAMP=$(date -d '$HRS' --rfc-3339=seconds)
+            OLDEST_ALLOWED_TIMESTAMP=$(date -d '${HRS}' --rfc-3339=seconds)
             CREATED_AT=$(date -d "$CREATED_AT" --rfc-3339=seconds)
             echo "CREATED_AT: $CREATED_AT"
             echo "OLDEST_ALLOWED_TIMESTAMP: $OLDEST_ALLOWED_TIMESTAMP"
