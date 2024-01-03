@@ -7,7 +7,7 @@ on:
         required: true
         default: 'warning'
       closeAlert:
-        description: 'Enter yes if you wanna close this aler a false positive'
+        description: 'Enter yes if you wanna close this aler as false positive'
         required: true
         default: 'false'
       start_date:
@@ -155,7 +155,7 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"            
               echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user}" >> code_alert.csv         
               echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
-              CLOSE_ALERT=${{ github.event.inputs.severity }}
+              CLOSE_ALERT=${{ github.event.inputs.closeAlert }}
               
               if [ "$CLOSE_ALERT" == "true" ]; then
                 echo "Closing $HTML_URL as false positive"
