@@ -2,10 +2,14 @@ name: UPDATE_OR_CLOSE:API Code Sacn Alerts
 on:
   workflow_dispatch:
     inputs:
-      direction:
-        description: 'Enter direction to process the Code Scan Alerts'
+      severity:
+        description: 'Enter severity(Can be one of: all, critical, high, medium, low, warning, note, error) to process the Code Scan Alerts'
         required: true
-        default: 'asc'
+        default: 'warning'
+      closeAlert:
+        description: 'Enter yes if you wanna close this aler a false positive'
+        required: true
+        default: 'false'
       start_date:
         description: 'Enter Start date to process the Code Scan Alerts'
         required: true
@@ -29,7 +33,7 @@ jobs:
       run: |
         TOKEN="${{ secrets.NOT_MY_PAT }}"
         BASE_URL="https://api.github.com"
-        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open&severity=warning&sort=created&direction=asc"      
+        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open&severity=${{ github.event.inputs.severity }}&sort=created&direction=asc"      
         BREAK_FLAG="DONT_BREAK"
         ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
         COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
@@ -107,7 +111,7 @@ jobs:
                 break
               fi
                             
-              SEVERITY=$(_jq '.rule.security_severity_level')
+              SEVERITY=$(_jq '.rule.severity')
               HTML_URL=$(_jq '.html_url')
               ALERT_NUMBER=$(_jq '.number')
               ALERT_STATE=$(_jq '.state')
@@ -151,6 +155,11 @@ jobs:
               echo "++++++++++++++++++++++++++++++++++"            
               echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user}" >> code_alert.csv         
               echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
+              CLOSE_ALERT=${{ github.event.inputs.severity }}
+              
+              if [ "$CLOSE_ALERT" == "true" ]; then
+                echo "Closing $HTML_URL as false positive"
+              fi
               
           done
           echo "REL: $REL"
