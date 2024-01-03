@@ -113,6 +113,7 @@ jobs:
                             
               SEVERITY=$(_jq '.rule.severity')
               HTML_URL=$(_jq '.html_url')
+              CSAPI_URL=$(_jq '.url')
               ALERT_NUMBER=$(_jq '.number')
               ALERT_STATE=$(_jq '.state')
               TOOL_NAME=$(_jq '.tool.name')
@@ -159,6 +160,16 @@ jobs:
               
               if [ "$CLOSE_ALERT" == "true" ]; then
                 echo "Closing $HTML_URL as false positive"
+                curl -X PATCH \
+                       -u "$TOKEN" \
+                       -H "Accept: application/vnd.github.v3+json" \
+                       "$CSAPI_URL" \
+                       -d '{
+                          "state":"dismissed",
+                          "dismissed_reason":"false positive",
+                          "dismissed_comment":"This alert is dismissed as part of automated workflow"
+                        }'
+                exit 0
               fi
               
           done
