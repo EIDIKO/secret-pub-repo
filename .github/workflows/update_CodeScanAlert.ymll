@@ -1,0 +1,186 @@
+name: UPDATE_OR_CLOSE:API Code Sacn Alerts
+on:
+  workflow_dispatch:
+    inputs:
+      direction:
+        description: 'Enter direction to process the Code Scan Alerts'
+        required: true
+        default: 'asc'
+      start_date:
+        description: 'Enter Start date to process the Code Scan Alerts'
+        required: true
+        default: 'November 7, 2023 00:00:00'
+      end_date:
+        description: 'Enter End date to process the Code Scan Alerts'
+        required: true
+        default: 'November 9, 2023 23:59:59'
+  #schedule:
+    #- cron: '0 0 * * *' # Runs at 00:00 UTC (midnight)
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2    
+    - name: Process Code Scan Alerts
+      id: extract-delivery-create-issue
+      env:
+        I_URL: "https://api.github.com/repos/EIDIKO/secret-pub-repo/issues/249"
+      run: |
+        TOKEN="${{ secrets.NOT_MY_PAT }}"
+        BASE_URL="https://api.github.com"
+        API_URL="$BASE_URL/orgs/kelloggcompany/code-scanning/alerts?per_page=100&page=1&state=open&severity=warning&sort=created&direction=asc"      
+        BREAK_FLAG="DONT_BREAK"
+        ISSUE_DATA="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n"
+        COMMENT_BODY_MD="|ISSUE_NUMBER|ISSUE_URL|ISSUE_TITLE|ASS_LOGIN|ASS_TYPE|\n|------------|---------|-----------|---------|--------|\n"
+        COMMENT_BODY_ISSUES="|ISSUE_STATUS|ISSUE_COUNT|3DAYS_OLD|7DAYS_OLD|\n|------------|---------|------------|------------|\n|OPEN|ISSUE_COUNT_VAL|3DAYS_OLD_VAL|7DAYS_OLD_VAL|"
+        ISSUE_COUNT=0
+        ISSUE_COUNT_3D_OLD=0
+        ISSUE_COUNT_7D_OLD=0
+
+        echo "SEVERITY, AUTH_NAME, AUTH_EMAIL, AUTH_NAME, REPO_NAME, FULL_REPO_NAME, COMMIT_URL, HTML_URL, ALERT_NUMBER, ALERT_STATE, TOOL_NAME, login_user" > code_alert.csv 
+        for ((i = 1; i != 0; i++)); do
+          echo "Running code for iteration $i"
+
+          echo "API_URL: $API_URL"
+
+          SCA_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+          HEADERS=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+          HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+          
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "No deliveries found or error in API response, exiting smoothly"
+            echo $SCAs
+            i=$((0))
+            exit 0
+          fi
+                    
+          LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+          REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+          NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+          echo "Status: $HTTP_STATUS"
+          #echo "LINK: $LINK_HEADER"
+          echo "FIRST_URL: $NEXT_URL"
+          echo "FIRST_REL: $REL"
+          IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
+          SECOND_URL="${URL_ARRAY[1]}"
+          SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
+          echo "SECOND_URL: $SECOND_URL"
+
+          if [ -z "$SECOND_URL" ]; then
+              echo "SECOND_URL is null or empty"
+              API_URL=$NEXT_URL
+            else
+              echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+              API_URL=$SECOND_URL
+          fi          
+          
+          SCAs=$(echo "$SCA_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')
+          
+          echo "Sort the array of JSON objects in ascending order based on the created_at"
+          #SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at)')
+          SCA_DELIVERIES=$(echo "$SCAs" | jq 'sort_by(.created_at) | reverse')          
+          for SCA in $(echo "${SCAs}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo "${SCA}" | base64 --decode | jq -r "${1}"
+              }
+              echo "++++++++++++++++++++++++++++++++++"
+              SAC_ALERT=$(_jq '.html_url')
+              let "ISSUE_COUNT+=1"
+              let "ISSUE_COUNT_3D_OLD+=1"
+              
+              CREATED_AT=$(_jq '.created_at')
+              START_DATE_TIMESTAMP=$(date -d '${{ github.event.inputs.start_date }}' --rfc-3339=seconds)
+              OLDEST_ALLOWED_TIMESTAMP=$(date -d '${{ github.event.inputs.end_date }}' --rfc-3339=seconds)
+              
+              if [ "$CREATED_AT" \< "$START_DATE_TIMESTAMP" ]; then
+                echo "In CSAlert $SAC_ALERT, CD is $CREATED_AT  older than SD $START_DATE_TIMESTAMP. "
+                echo "Exiting  Inner Loop as remaing alerts are also older"
+                let "ISSUE_COUNT_7D_OLD+=1"                
+                break
+              fi
+              
+              if [ "$CREATED_AT" \> "$OLDEST_ALLOWED_TIMESTAMP" ]; then
+                echo "CSAlert $SAC_ALERT is older than $OLDEST_ALLOWED_TIMESTAMP."
+                echo "Exiting workflow as remaining CSAs are also newer"
+                REL="BREAK"
+                break
+              fi
+                            
+              SEVERITY=$(_jq '.rule.security_severity_level')
+              HTML_URL=$(_jq '.html_url')
+              ALERT_NUMBER=$(_jq '.number')
+              ALERT_STATE=$(_jq '.state')
+              TOOL_NAME=$(_jq '.tool.name')
+              
+              COMMIT_SHA=$(_jq '.most_recent_instance.commit_sha')
+              REPO_NAME=$(_jq '.repository.name')
+              FULL_REPO_NAME=$(_jq '.repository.full_name')
+              COMMIT_URL="https://api.github.com/repos/$FULL_REPO_NAME/commits/$COMMIT_SHA"
+              
+              COMMITS=$(curl -s -X GET -u "$TOKEN" "$COMMIT_URL")
+              #echo "Commits: $COMMITS"
+              # Get Auther Email using API
+              AUTH_EMAIL=$(echo $COMMITS | jq -r '.commit.author.email') 
+              AUTH_NAME=$(echo $COMMITS | jq -r '.commit.author.name')
+              if [[ "$AUTH_EMAIL" == *users.noreply.github.com* ]]; then
+                login_user=$(echo "$AUTH_EMAIL" | cut -d'+' -f2 | cut -d'@' -f1)
+                echo $login_user
+              else
+                echo $AUTH_EMAIL
+                COMMITS_AUTH_DETAILS=$(curl -s -X GET -u "$TOKEN" "$BASE_URL/search/commits?q=author-email:$AUTH_EMAIL")
+                #echo $COMMITS_AUTH_DETAILS
+                # Get Auther Username using API
+                login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
+              fi
+              echo $login_user            
+              #ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SEVERITY\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+              #echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              ISSUE_URL=$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
+              ISSUE_NUMBER=$(echo $ISSUE_RESPONSE | jq -r '.number') 
+              REPO_URL=$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
+              ISSUE_TITLE=$(echo $ISSUE_RESPONSE | jq -r '.title') 
+              ASS_LOGIN=$(echo $ISSUE_RESPONSE | jq -r '.assignee.login') 
+              ASS_TYPE=$(echo $ISSUE_RESPONSE | jq -r '.assignee.type')
+              issue_data="${ISSUE_DATA//ISSUE_NUMBER/$REPO_URL#$ISSUE_NUMBER}"
+              issue_data="${issue_data//ISSUE_URL/$ISSUE_URL}"
+              issue_data="${issue_data//ISSUE_TITLE/$ISSUE_TITLE}"
+              issue_data="${issue_data//ASS_LOGIN/$ASS_LOGIN}"
+              issue_data="${issue_data//ASS_TYPE/$ASS_TYPE}"
+              COMMENT_BODY_MD="$COMMENT_BODY_MD$issue_data"
+              echo "++++++++++++++++++++++++++++++++++"            
+              echo "${SEVERITY}, ${AUTH_NAME}, ${AUTH_EMAIL}, ${AUTH_NAME}, ${REPO_NAME}, ${FULL_REPO_NAME}, ${COMMIT_URL}, ${HTML_URL}, ${ALERT_NUMBER}, ${ALERT_STATE}, ${TOOL_NAME}, ${login_user}" >> code_alert.csv         
+              echo $SEVERITY, $AUTH_NAME, $AUTH_EMAIL, $AUTH_NAME, $REPO_NAME, $FULL_REPO_NAME, $COMMIT_URL, $HTML_URL, $ALERT_NUMBER, $ALERT_STATE, $TOOL_NAME, $login_user 
+              
+          done
+          echo "REL: $REL"
+          if [ "$REL" != "next" ]; then
+            echo "Breaking External For loop"
+            break
+          fi
+        done
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//ISSUE_COUNT_VAL/$ISSUE_COUNT}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//3DAYS_OLD_VAL/$ISSUE_COUNT_3D_OLD}"
+        COMMENT_BODY_ISSUES="${COMMENT_BODY_ISSUES//7DAYS_OLD_VAL/$ISSUE_COUNT_7D_OLD}"
+        curl -X POST \
+              -u "$TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "$I_URL/comments" \
+               -d '{
+                    "body": "'"$COMMENT_BODY_ISSUES"'"
+                }'
+        curl -X POST \
+               -u "$TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               "$I_URL/comments" \
+               -d '{
+                    "body": "'"$COMMENT_BODY_MD"'"
+                }'
+    - name: Issue Created
+      if: success()
+      run: echo "GitHub issue created successfully."
+    - name: Upload Scanned alerts by repo name
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: Code_Scan_Alerts
+        path: code_alert.csv
