@@ -115,8 +115,8 @@ jobs:
                 login_user=$(echo $COMMITS_AUTH_DETAILS | jq -r '.items[0].author.login')
               fi
               echo $login_user            
-              #ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SEVERITY\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
-              #echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
+              ISSUE_RESPONSE=$(curl -X POST -u "$TOKEN" -d "{\"title\":\"$SEVERITY\",\"body\":\"$HTML_URL\",\"assignees\":[\"$login_user\"]}" "$BASE_URL/repos/$FULL_REPO_NAME/issues")
+              echo "GitHub Issue Creation Response: $ISSUE_RESPONSE"
               ISSUE_URL=$(echo $ISSUE_RESPONSE | jq -r '.html_url') 
               ISSUE_NUMBER=$(echo $ISSUE_RESPONSE | jq -r '.number') 
               REPO_URL=$(echo $ISSUE_RESPONSE | jq -r '.repository_url') 
