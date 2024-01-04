@@ -76,7 +76,7 @@ jobs:
               
               CREATED_AT=$(_jq '.created_at')               
               ONEDAY_OLD_TIMESTAMP=$(date -d '24 hours ago' --rfc-3339=seconds)
-              echo "CD: CREATED_AT "
+              echo "CD: $CREATED_AT "
               if [ "$CREATED_AT" \< "$ONEDAY_OLD_TIMESTAMP" ]; then
                 echo "CSAlert $SAC_ALERT is older than 24 hours. Skipping further process."
                 echo "Exiting workflow as remaining SCAs are also older than 24 hrs"
