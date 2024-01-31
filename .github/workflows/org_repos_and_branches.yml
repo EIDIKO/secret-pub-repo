@@ -1,0 +1,87 @@
+name: API Get Org Repos and Branch Details
+on:
+  workflow_dispatch:
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest    
+    steps:  
+    - name: Get Org Repos and Branch Details
+      id: extract-repos-and-branches
+      run: |
+        TOKEN="${{ secrets.NOT_MY_PAT }}"
+        BASE_URL="https://api.github.com"
+        API_URL="$BASE_URL/orgs/kelloggcompany/repos?per_page=100&page=1&sort=created&direction=desc"      
+        BREAK_FLAG="DONT_BREAK"
+
+        echo "FULL_REPO_NAME, REPO_NAME, BRANCH_NAME, BRANCH_PROTECTED, REPO_URL" > repo_branches.csv 
+        for ((i = 1; i != 0; i++)); do
+          echo "Running Repo API for iteration $i"
+          echo "API_URL: $API_URL"
+
+          REPO_API_RESPONSE=$(curl -s -i -X GET -u "$TOKEN" "$API_URL")
+          HEADERS=$(echo "$REPO_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==1')
+          HTTP_STATUS=$(echo "$HEADERS" | head -n 1 | awk '{print $2}')
+          
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "No repositories found or error in API response, exiting smoothly"
+            echo $SCAs
+            i=$((0))
+            exit 0
+          fi                    
+          LINK_HEADER=$(echo "$HEADERS" | grep -i "link:" | awk -F': ' '{print $2}')
+          REL=$(echo "$LINK_HEADER" | sed -n 's/.*rel="\([^"]*\)".*/\1/p')
+          NEXT_URL=$(echo "$LINK_HEADER" | sed -n 's/<\([^>]*\)>;.*/\1/p')
+          echo "Status: $HTTP_STATUS"
+          echo "FIRST_URL: $NEXT_URL"
+          echo "FIRST_REL: $REL"
+          IFS=',' read -ra URL_ARRAY <<< "$LINK_HEADER"
+          SECOND_URL="${URL_ARRAY[1]}"
+          SECOND_URL=$(echo "$SECOND_URL" | awk -F'<' '{print $2}' | awk -F'>' '{print $1}')
+          echo "SECOND_URL: $SECOND_URL"
+          if [ -z "$SECOND_URL" ]; then
+              echo "SECOND_URL is null or empty"
+              API_URL=$NEXT_URL
+            else
+              echo "SECOND_URL is not null or empty and is: $SECOND_URL"
+              API_URL=$SECOND_URL
+          fi                    
+          REPOs=$(echo "$REPO_API_RESPONSE" | awk -v RS='\r\n\r\n' 'NR==2')        
+          for REPO in $(echo "${REPOs}" | jq -r '.[] | @base64'); do
+              _jq() {
+                echo "${REPO}" | base64 --decode | jq -r "${1}"
+              }
+              echo "++++++++++++++++++++++++++++++++++"
+                            
+
+              REPO_HTML_URL=$(_jq '.html_url')
+              REPO_URL=$(_jq '.url')             
+              REPO_NAME=$(_jq '.name')
+              FULL_REPO_NAME=$(_jq '.full_name')
+              BRANCH_URL="https://api.github.com/repos/$FULL_REPO_NAME/branches"
+              
+              BRANCHES=$(curl -s -X GET -u "$TOKEN" "$BRANCH_URL")
+              for BRANCH in $(echo "${BRANCHES}" | jq -r '.[] | @base64'); do
+                  _jq() {
+                    echo "${BRANCH}" | base64 --decode | jq -r "${1}"
+                 }
+
+                 BRANCH_NAME=$(_jq '.name') 
+                 IS_BRANCH_PROTECTED=$(_jq '.protected')
+
+
+                 echo "++++++++++++++++++++++++++++++++++" 
+                 echo "${FULL_REPO_NAME}, ${REPO_NAME}, ${BRANCH_NAME}, ${BRANCH_PROTECTED}, ${REPO_URL}" > repo_branches.csv                        
+                 echo $FULL_REPO_NAME, $REPO_NAME, $BRANCH_NAME, $BRANCH_PROTECTED, $REPO_URL
+              done             
+          done
+          echo "REL: $REL"
+          if [ "$REL" != "next" ]; then
+            echo "Breaking External For loop"
+            break
+          fi
+        done
+    - name: Upload branch details by repo name
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: Repo_Branche_Details
+        path: repo_branches.csv
